@@ -1,0 +1,22 @@
+@use "./components/buttons" as btn;
+@use "./abstracts/mixins" as mix;
+@use "./abstracts/variables" as var;
+
+.wrapper {
+  margin: 0 8%;
+  margin-top: 100px;
+
+  @include mix.respond-to(var.$laptop) {
+    margin: 60px 5%;
+  }
+  @include mix.respond-to(var.$tablet) {
+    margin: 60px 3%;
+  }
+  @include mix.respond-to(var.$mobile) {
+    margin-top: 100px;
+  }
+}
+
+* {
+  font-family: "Inter", sans-serif;
+}

@@ -1,0 +1,66 @@
+@use "../abstracts/mixins" as mix;
+@use "../abstracts/variables" as var;
+
+div {
+  .products-container {
+    @include mix.respond-to(var.$mobile) {
+      flex-direction: column;
+    }
+display: flex;
+    .items-contener {
+      .items-wrapper {
+        @include mix.respond-to(var.$mobile) {
+          display: flex;
+          justify-content: center;
+          flex-direction: row;
+        }
+        .items {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          grid-row-gap: 24px;
+          grid-column-gap: 16px;
+          justify-items: center;
+
+          @include mix.respond-to(var.$laptop) {
+            grid-template-columns: repeat(3, 1fr);
+          }
+          @include mix.respond-to(var.$tablet) {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+      }
+    }
+  }
+  .pagination {
+    margin: 40px 0 55px 0;
+    ul {
+      display: flex;
+      justify-content: center;
+      .next,
+      .previous,
+      .break {
+        background-color: #ffffff;
+        color: #000000;
+      }
+      li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        width: 32px;
+        height: 32px;
+        color: #ffffff;
+        background-color: #000000;
+        margin: 0 8px;
+        cursor: pointer;
+        user-select: none;
+        border-radius: 8px;
+      }
+      .selected {
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px #000000 solid;
+      }
+    }
+  }
+}

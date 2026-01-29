@@ -1,0 +1,77 @@
+.ProductCard {
+  /* Базовые стили для всех устройств */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 16rem;
+  padding: 1rem;
+  background-color: #f6f6f6;
+  border-radius: 10px;
+
+  .Like-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    .Like {
+      width: 2rem;
+      cursor: pointer;
+    }
+  }
+
+  .product-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    img {
+      width: 100%;
+    }
+    p {
+      text-align: center;
+    }
+  }
+}
+
+/* --- */
+
+/* Медиа-запрос для экранов шириной до 768px (мобильные устройства) */
+@media screen and (max-width: 768px) {
+  .ProductCard {
+    /* Уменьшаем размер карточки и её отступы */
+    max-width: 12rem;
+    padding: 0.75rem;
+
+    .Like-container .Like {
+      /* Уменьшаем размер иконки "Like" */
+      width: 1.5rem;
+    }
+
+    .product-data {
+      margin-bottom: 1rem;
+      /* Уменьшаем размер шрифта для текста */
+      p,
+      span {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+/* --- */
+
+/* Медиа-запрос для экранов шириной от 1200px (большие десктопы) */
+@media screen and (min-width: 1200px) {
+  .ProductCard {
+    /* Увеличиваем размер карточки для больших экранов */
+    max-width: 20rem;
+    padding: 1.5rem;
+
+    .product-data {
+      /* Увеличиваем размер шрифта для текста */
+      p,
+      span {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}

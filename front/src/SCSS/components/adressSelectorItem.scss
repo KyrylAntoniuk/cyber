@@ -1,0 +1,126 @@
+.adress-item-wrapper {
+  .adress-change-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 24px 0;
+    border-radius: 10px;
+    background-color: #f6f6f6;
+    padding: 24px 12px 24px 64px;
+    .items-change {
+      .adress-name-change-wrapper {
+        input {
+          border: none;
+          border-bottom: 0.5px solid #9f9f9f;
+          background-color: #f6f6f6;
+          font-size: 18px;
+          margin-right: 12px;
+          &:focus {
+            outline: none;
+          }
+        }
+        .tag-selector {
+          background-color: #000;
+          color: #fff;
+          padding: 4px 8px;
+          font-size: 12px;
+          border-radius: 5px;
+          margin: 0;
+        }
+      }
+      .adress-deteil-change-wrapper {
+        input {
+          border: none;
+          border-bottom: 0.5px solid #9f9f9f;
+          background-color: #f6f6f6;
+          font-size: 16px;
+          margin: 16px 0;
+
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+      input {
+        border: none;
+        border-bottom: 0.5px solid #9f9f9f;
+        background-color: #f6f6f6;
+        font-size: 16px;
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+    .button-wrapper {
+      display: flex;
+      align-items: center;
+      button {
+        background-color: transparent;
+        border: none;
+        margin: 0 12px;
+        cursor: pointer;
+      }
+    }
+  }
+  .adress-item {
+    margin: 24px 0;
+    border-radius: 10px;
+    background-color: #f6f6f6;
+    display: flex;
+    justify-content: space-between;
+    div {
+      display: flex;
+    }
+    .input-wrapper {
+      display: flex;
+      align-items: flex-start;
+      input[type="radio"] {
+        width: 24px;
+        height: 24px;
+        margin: 30px 16px 0 24px;
+
+        &:checked {
+          accent-color: #000;
+        }
+      }
+    }
+    .adress-data-wrapper {
+      display: flex;
+      flex-direction: column;
+      .adress-name-wrapper {
+        display: flex;
+        align-items: center;
+        margin: 24px 0 16px 0;
+        .adress-name {
+          margin: 0 16px;
+          font-size: 18px;
+        }
+        .adress-tag {
+          color: #fff;
+          background-color: #000;
+          padding: 4px 8px;
+          font-size: 12px;
+          border-radius: 5px;
+          margin: 0;
+        }
+      }
+      .adress-details-wrapper {
+        p {
+          margin: 0;
+          margin-bottom: 8px;
+        }
+      }
+      .phone-number {
+        margin: 0;
+        margin-bottom: 24px;
+      }
+    }
+    .button-wrapper {
+      button {
+        background-color: transparent;
+        border: none;
+        margin: 0 12px;
+        cursor: pointer;
+      }
+    }
+  }
+}

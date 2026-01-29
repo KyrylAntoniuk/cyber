@@ -1,0 +1,144 @@
+@import "../abstracts/mixins.scss";
+@import "../abstracts//variables";
+
+.productDetailedpage {
+  .product-wrapper {
+    width: 100%;
+    display: flex;
+    @include respond-to($tablet) {
+      flex-direction: column;
+    }
+
+    .left-section {
+      align-self: center;
+      img {
+        max-width: 60vw;
+      }
+    }
+    .right-secion {
+      .product-name {
+        font-size: 40px;
+        font-weight: 700;
+      }
+      .product-price {
+        font-size: 32px;
+      }
+      .options {
+        .product-option-color {
+          .option-values {
+            display: flex;
+            div {
+              width: 32px;
+              height: 32px;
+              border-radius: 32px;
+              margin: 8px 4px;
+              cursor: pointer;
+
+              .option-item {
+                display: none;
+              }
+            }
+          }
+          .option-item_active{
+            display: none;
+          }
+        }
+        .product-option {
+          .option-values {
+            display: flex;
+            .option-item {
+              height: 48px;
+              width: 120px;
+              border: 1px #949494 solid;
+              color: #949494;
+              border-radius: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 8px 4px;
+              cursor: pointer;
+              @include respond-to($tablet) {
+                width: 60px;
+                padding: 0 16px;
+              }
+              
+            }
+            .option-item_active{
+                @extend .option-item;
+                border: 1px #000000 solid;
+                color: #000000;
+              }
+          }
+        }
+      }
+      .characteristics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        @include respond-to($tablet) {
+          
+          display: flex;
+          flex-wrap: wrap;
+        justify-content: center;
+        }
+
+        .characteristics-item {
+          width: 165px;
+          height: 64px;
+          margin: 8px;
+          display: flex;
+          align-items: center;
+          background-color: #f4f4f4;
+          border-radius: 10px;
+
+          svg {
+            margin: 0 8px;
+          }
+          div {
+            display: flex;
+            flex-direction: column;
+            span {
+              font-size: 14px;
+              color: #c4c4c4;
+              font-weight: 400;
+            }
+            p {
+              font-size: 14px;
+              color: #4e4e4e;
+              font-weight: 500;
+              margin: 0;
+            }
+          }
+        }
+      }
+      .button-wrapper {
+        margin-top: 16px;
+        display: flex;
+        @include respond-to($tablet) {
+          flex-direction: column;
+        }
+        button {
+          margin: 0 8px;
+          @include respond-to($tablet) {
+            margin: 8px 0;
+          }
+        }
+      }
+    }
+  }
+  .decr-section-wrapper {
+    .decr-section {
+      span {
+        font-size: 20px;
+        font-weight: 500;
+        padding-top: 10px;
+      }
+      div {
+        .description-item {
+          justify-content: space-between;
+          display: flex;
+          border-bottom: 1px solid #cdcdcd;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+@use "../abstracts/mixins" as mix;
+@use "../abstracts/variables" as var;
+
+.button-black {
+  font-size: var.$mobile-font-size;
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+  background-color: #000;
+  &:hover {
+    color: #000;
+    background-color: #fff;
+    outline: 1px solid #000;
+    outline-offset: -1px;
+  }
+  @include mix.respond-to(var.$mobile) {
+    background-image: none;
+  }
+}
+
+.button-white {
+  @extend .button-black;
+  background-color: #fff;
+  color: #000;
+  outline: 1px solid #000;
+  outline-offset: -1px;
+  &:hover {
+    color: #fff;
+    background-color: #000;
+    outline: 1px solid #fff;
+    outline-offset: -1px;
+  }
+}

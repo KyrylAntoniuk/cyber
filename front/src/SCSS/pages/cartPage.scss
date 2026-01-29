@@ -1,0 +1,43 @@
+.cart-wrapper {
+  display: flex;
+  justify-content: space-between;
+  .Order-summary {
+    padding: 0 60px;
+    border: 1px solid #ebebeb;
+    width: 30%;
+    .bonus-section {
+      margin: 12px 0;
+      p {
+        margin: 0;
+        font-size: 14px;
+        color: #545454;
+      }
+      input {
+        border: 0.5px solid #9f9f9f;
+        border-radius: 10px;
+        padding: 16px 20px;
+        width: 90%;
+      }
+    }
+    .total-price {
+      display: flex;
+      flex-direction: column;
+      div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        span {
+          font-size: 16px;
+          margin: 8px 0;
+        }
+        p {
+          color: #545454;
+          margin: 8px 0;
+        }
+      }
+    }
+    .button-black {
+      margin: 48px 0;
+    }
+  }
+}

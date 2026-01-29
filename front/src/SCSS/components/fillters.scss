@@ -1,0 +1,77 @@
+@import "../abstracts/mixins.scss";
+@import "../abstracts/variables";
+
+.filters-container {
+  margin-right: 2rem;
+  @include respond-to($tablet) {
+    margin-right: 0;
+  }
+
+  h1 {
+    @include respond-to($tablet) {
+      display: none;
+    }
+  }
+  .burger {
+    display: none;
+    background-color: transparent;
+    outline: 0.5px solid #d4d4d4;
+    outline-offset: -0.5px;
+    border: none;
+    border-radius: 10px;
+    width: 45%;
+    padding: 12px 16px;
+
+    @include respond-to($tablet) {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+  .filter-items-visible {
+    @extend .filter-items;
+    display: block !important;
+    background-color: #fff;
+    position: inherit;
+  }
+  .filter-items {
+    @include respond-to($tablet) {
+      display: none;
+    }
+
+    div {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid #b5b5b5;
+
+      span {
+        font-size: 18px;
+        font-weight: 600;
+        padding-right: 20px;
+      }
+      button {
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+      }
+    }
+
+    .filter-options {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        font-weight: 500;
+        margin: 4px 0;
+
+        input {
+          accent-color: black;
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,92 @@
+@use "../abstracts/mixins" as mix;
+@use "../abstracts/variables" as var;
+
+.add-adress-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  .dashed-line {
+    position: relative;
+
+    top: -16px;
+    height: 1px;
+    background: linear-gradient(to right, #000 50%, transparent 50%);
+    background-size: 8px 1px;
+    width: 100%;
+  }
+  button {
+    position: relative;
+
+    background-color: transparent;
+    border: none;
+  }
+}
+.adress-change-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 24px 0;
+  border-radius: 10px;
+  background-color: #f6f6f6;
+  padding: 24px 12px 24px 64px;
+  .items-change {
+    .adress-name-change-wrapper {
+      input {
+        border: none;
+        border-bottom: 0.5px solid #9f9f9f;
+        background-color: #f6f6f6;
+        font-size: 18px;
+        margin-right: 12px;
+        width: 50%;
+        &:focus {
+          outline: none;
+        }
+      }
+      .tag-selector {
+        background-color: #000;
+        color: #fff;
+        padding: 4px 8px;
+        font-size: 12px;
+        border-radius: 5px;
+        margin: 0;
+      }
+    }
+    .adress-deteil-change-wrapper {
+      input {
+        border: none;
+        border-bottom: 0.5px solid #9f9f9f;
+        background-color: #f6f6f6;
+        font-size: 16px;
+        margin: 16px 0;
+        width: 40%;
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+    input {
+      border: none;
+      border-bottom: 0.5px solid #9f9f9f;
+      background-color: #f6f6f6;
+      font-size: 16px;
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+  .button-wrapper {
+    display: flex;
+    align-items: center;
+
+    button {
+      background-color: transparent;
+      border: none;
+      margin: 0 12px;
+      cursor: pointer;
+      @include mix.respond-to(var.$mobile) {
+        margin: 0;
+      }
+    }
+  }
+}

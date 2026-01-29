@@ -1,0 +1,13 @@
+@use "../abstracts/mixins" as mix;
+@use "../abstracts/variables" as var;
+.Checkout-wrapper {
+  .steges {
+    display: flex;
+    justify-content: space-around;
+    img {
+      @include mix.respond-to(var.$mobile) {
+        width: 140px;
+      }
+    }
+  }
+}

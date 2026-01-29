@@ -1,0 +1,54 @@
+@use "../abstracts/mixins" as mix;
+@use "../abstracts/variables" as var;
+
+.search-conrainer {
+  position: relative;
+  .search {
+    padding: 16px 0;
+    font-size: 14px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 10px;
+
+    background-image: url("../../assets/Search.svg");
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 42px;
+    @include mix.respond-to(var.$laptop) {
+      background-image: none;
+    }
+    @include mix.respond-to(var.$tablet) {
+      background-image: none;
+      max-width: 20vw;
+    }
+    @include mix.respond-to(var.$mobile) {
+      padding-left: 16px;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .preview-products {
+    position: absolute;
+    background-color: #ffffff;
+    width: 30vw;
+    max-height: 80vh;
+    // border: 1px solid #000;
+    border-radius: 20px;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    .preview-item {
+      border-bottom: 1px solid #b5b5b5;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      cursor: pointer;
+      margin-top: 6px;
+      img {
+        width: 120px;
+      }
+    }
+  }
+}
