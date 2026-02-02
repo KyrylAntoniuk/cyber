@@ -1,11 +1,11 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import "../../SCSS/components/cartItem.scss";
-import CloseSvg from "../../assets/Close.svg"; // Проверьте путь к иконке
-import MinusSvg from "../../assets/Minus.svg"; // Проверьте путь к иконке
-import PlusSvg from "../../assets/Plus.svg";   // Проверьте путь к иконке
+// Убедитесь, что пути правильные, SVG часто капризны к регистру букв
+import CloseSvg from "../../assets/Close.svg"; 
+import MinusSvg from "../../assets/Minus.svg"; 
+import PlusSvg from "../../assets/Plus.svg"; 
 
-// Импортируем правильные действия из слайса
 import { addItem, minusItem, removeItem } from "../../redux/slices/cartSlice";
 
 const CartItem = ({ id, title, price, count, imageUrl, type, size }) => {
@@ -15,16 +15,19 @@ const CartItem = ({ id, title, price, count, imageUrl, type, size }) => {
     dispatch(
       addItem({
         id,
+        title,
+        price,
+        imageUrl,
+        type,
+        size,
       })
     );
   };
 
   const onClickMinus = () => {
-    // Не даем уйти в минус
     if (count > 1) {
        dispatch(minusItem(id));
     } else {
-       // Если товар 1 и нажимаем минус — можно спросить удаление или просто удалить
        if(window.confirm('Удалить товар?')) {
          dispatch(removeItem(id));
        }
@@ -44,7 +47,6 @@ const CartItem = ({ id, title, price, count, imageUrl, type, size }) => {
       </div>
       <div className="cart-item__info">
         <h3>{title}</h3>
-        {/* Если есть параметры (тип, размер), можно вывести их тут */}
         <p>{type} {size}</p> 
       </div>
       <div className="cart-item__count">

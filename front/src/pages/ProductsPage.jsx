@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactPaginate from "react-paginate";
 
@@ -6,48 +6,62 @@ import ProductCard from "./components/ProductCard";
 import Filters from "./components/Filters";
 import { fetchProducts } from "../redux/slices/productSlice";
 import { fetchWishlistItems } from "../redux/slices/wishlistSlice";
+
 import "../SCSS/pages/productsPage.scss";
 
-const pageRangeDisplayed = 8;
+const LIMIT = 8; // Must match or be close to what backend expects
 
 function ProductPage() {
   const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = React.useState(1);
+  
+  // Use local state for immediate UI response, or rely on Redux state
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { items, status } = useSelector((state) => state.product);
+  // Get data from Redux
+  const { items, status, totalPages } = useSelector((state) => state.product);
   const { selectedFilters, serchValue } = useSelector((state) => state.filter);
   const { wishlistItems } = useSelector((state) => state.wishlist);
 
-  React.useEffect(() => {
-    getProducts();
-  }, [selectedFilters, currentPage, serchValue]);
+  // 1. Reset to page 1 when filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilters, serchValue]);
 
-  const getProducts = () => {
-    const params = {
-      page: currentPage,
-      limit: pageRangeDisplayed,
-      search: serchValue,
+  // 2. Fetch products whenever page, filters, or search changes
+  useEffect(() => {
+    const getProducts = async () => {
+      const params = {
+        page: currentPage,
+        limit: LIMIT,
+        search: serchValue,
+      };
+
+      // Convert filter arrays to strings if needed
+      Object.entries(selectedFilters).forEach(([key, value]) => {
+        if (Array.isArray(value) && value.length > 0) {
+          params[key] = value.join(",");
+        }
+      });
+
+      dispatch(fetchProducts(params));
+      dispatch(fetchWishlistItems());
     };
 
-    Object.entries(selectedFilters).forEach(([key, value]) => {
-      if (value && value.length > 0) {
-        params[key] = value.join(",");
-      }
-    });
+    getProducts();
+    window.scrollTo(0, 0);
+  }, [currentPage, selectedFilters, serchValue, dispatch]);
 
-    dispatch(fetchProducts(params));
-    dispatch(fetchWishlistItems());
-  };
-
+  // Wishlist check set
   const wishlistSet = new Set(
     wishlistItems.map((item) => (item.product ? item.product._id : item.itemId))
   );
 
   return (
-    <div>
+    <div className="container">
       <p>
-        Found Products: <span>{items.length}</span>
+        Found Products: <span>{items ? items.length : 0}</span>
       </p>
+
       <div className="products-container">
         <div className="Filters">
           <Filters />
@@ -60,11 +74,14 @@ function ProductPage() {
                 <h2>Loading...</h2>
               ) : status === "error" ? (
                 <h2>Error loading products 😕</h2>
+              ) : (!Array.isArray(items) || items.length === 0) ? (
+                <h2>Ничего не найдено 😕</h2>
               ) : (
+                // Safety check: Ensure items is an array before mapping
                 items.map((obj) => (
                   <ProductCard
                     key={obj._id}
-                    {...obj} // Передаем ВСЕ поля (img, productName, price...)
+                    {...obj}
                     isInWishlist={wishlistSet.has(obj._id)}
                   />
                 ))
@@ -74,16 +91,21 @@ function ProductPage() {
         </div>
       </div>
       
-      {items.length > 0 && (
-        <div className="pagination">
+      {/* Show Pagination only if we have pages */}
+      {status === 'success' && totalPages > 1 && (
+        <div className="pagination-wrapper">
           <ReactPaginate
             breakLabel="..."
             nextLabel=">"
-            onPageChange={(e) => setCurrentPage(e.selected + 1)}
-            pageRangeDisplayed={pageRangeDisplayed}
-            pageCount={10} 
             previousLabel="<"
+            onPageChange={(e) => setCurrentPage(e.selected + 1)}
+            pageRangeDisplayed={3}
+            pageCount={totalPages} 
+            forcePage={currentPage - 1} 
             renderOnZeroPageCount={null}
+            containerClassName="pagination"
+            activeClassName="active"
+            disabledClassName="disabled"
           />
         </div>
       )}

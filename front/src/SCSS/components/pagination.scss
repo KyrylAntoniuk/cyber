@@ -1,0 +1,31 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+
+  &__btn, &__num {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.2s;
+
+    &:hover {
+      background: #f0f0f0;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &.active {
+      background: #000; // Ваш основной цвет
+      color: #fff;
+      border-color: #000;
+    }
+  }
+}
