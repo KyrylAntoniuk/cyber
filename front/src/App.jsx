@@ -12,6 +12,7 @@ import Checkout from "./pages/Checkout.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
+import UserProfile from "./pages/UserProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ function App() {
           {/* Можно добавить маршрут по умолчанию, например на товары */}
           <Route path="*" element={<ProductPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<UserProfile />} />
 <Route path="/register" element={<Registration />} />
         </Routes>
       </div>

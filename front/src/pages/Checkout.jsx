@@ -1,48 +1,62 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../axios";
 
 import { clearCart } from "../redux/slices/cartSlice";
-import { cartTotalPrice } from "../utils/cartTotalPrice"; // Убедитесь, что этот путь верен
 
-// Компоненты (проверьте пути импорта)
+// Компоненты
 import AdressSelector from "./components/AdressSelector";
 import ShipmentSelector from "./components/ShipmentSelector";
-import PaymentSelection from "./components/PaymentSelection";
+// import PaymentSelection from "./components/PaymentSelection"; // Можно раскомментировать, если готово
 
-import "../SCSS/pages/CheckoutPage.scss"; // Проверьте путь к стилям
+import "../SCSS/pages/CheckoutPage.scss";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Достаем данные из Redux
-  // isAuth нужен, если вы хотите предзаполнить email, но для заказа это необязательно
   const { items, totalPrice } = useSelector((state) => state.cart);
-  const { data: userData } = useSelector((state) => state.auth || {}); // fallback если auth нет
+  // Проверяем авторизацию, чтобы знать, показывать ли сохраненные адреса
+  const { data: userData } = useSelector((state) => state.auth || {}); 
 
   const [isLoading, setIsLoading] = React.useState(false);
+  const [selectedSavedAddress, setSelectedSavedAddress] = React.useState(null);
 
   // Локальный стейт для формы
   const [formData, setFormData] = React.useState({
     addressName: "",
     postCode: "",
     phoneNumber: "",
-    address: "", // Само поле адреса
-    tag: "Home", // "Home" или "Office"
+    address: "",
+    tag: "Home", 
   });
 
-  // Если корзина пуста, уходим назад (защита от пустого заказа)
+  // Защита: если корзина пуста, уходим назад
   React.useEffect(() => {
     if (items.length === 0) {
       navigate("/");
     }
   }, [items, navigate]);
 
-  // Обработчик инпутов
+  // Обработчик ручного ввода
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Если пользователь начал писать сам, снимаем выделение с сохраненного адреса
+    setSelectedSavedAddress(null);
+  };
+
+  // Обработчик выбора адреса из списка (AdressSelector)
+  const handleSelectAddress = (addr) => {
+      setSelectedSavedAddress(addr);
+      setFormData({
+          addressName: addr.addressName || "",
+          postCode: addr.postCode || "",
+          phoneNumber: addr.phoneNumber || "",
+          address: addr.address || "", 
+          tag: addr.tag || "Home"
+      });
   };
 
   // Отправка заказа
@@ -50,22 +64,21 @@ const Checkout = () => {
     try {
       setIsLoading(true);
 
-      // 1. Формируем массив товаров для бэкенда (новая структура!)
+      // 1. Формируем товары
       const orderItems = items.map((item) => ({
-        product: item.id, // ID товара
+        product: item.id,
         quantity: item.count,
         price: item.price,
-        // Важно: передаем опции внутрь товара, как мы сделали в бэкенде
         selectedOptions: {
-            color: item.color || "#000000",      // пример получения из корзины
-            builtInMemory: item.capacity || "128GB" // пример
+            color: item.color || "#000000",
+            builtInMemory: item.capacity || "128GB"
         }
       }));
 
-      // 2. Собираем весь объект заказа
+      // 2. Собираем заказ
       const orderData = {
         items: orderItems,
-        totalAmount: totalPrice, // Общая сумма в корне
+        totalAmount: totalPrice,
         address: {
           addressName: formData.addressName,
           postCode: formData.postCode,
@@ -75,10 +88,10 @@ const Checkout = () => {
         },
       };
 
-      // 3. Отправляем на сервер
+      // 3. Отправляем
       const { data } = await axios.post("/orders", orderData);
 
-      // 4. Очищаем корзину и уходим
+      // 4. Успех
       dispatch(clearCart());
       alert(`Заказ №${data._id} успешно создан!`);
       navigate("/");
@@ -108,6 +121,18 @@ const Checkout = () => {
           {/* Секция адреса */}
           <section className="checkout-section">
             <h2>Address</h2>
+            
+            {/* Если пользователь вошел, показываем выбор адресов */}
+            {userData && (
+                <div style={{ marginBottom: '20px' }}>
+                    <AdressSelector 
+                        selectedAddress={selectedSavedAddress} 
+                        onSelect={handleSelectAddress} 
+                    />
+                </div>
+            )}
+
+            {/* Поля ввода (заполняются автоматически при выборе) */}
             <div className="form-group">
                 <input 
                     name="addressName"
@@ -136,11 +161,9 @@ const Checkout = () => {
                     />
                 </div>
             </div>
-            {/* Можно вернуть AdressSelector, если он работает корректно */}
-            {/* <AdressSelector /> */}
           </section>
 
-          {/* Другие секции можно добавить здесь (Shipment, Payment) */}
+          {/* Доставка */}
           <section className="checkout-section">
              <h2>Shipment Method</h2>
              <ShipmentSelector />
@@ -152,12 +175,10 @@ const Checkout = () => {
           <div className="summary-card">
             <h3>Summary</h3>
             
-            {/* СПИСОК ТОВАРОВ - ВОТ ЗДЕСЬ БЫЛА ОШИБКА */}
             <div className="summary-items">
               {items.map((item) => (
                 <div key={item.id + (item.color || "")} className="summary-item">
                   <div className="summary-item__img">
-                    {/* Проверка на наличие картинки */}
                     <img src={item.imageUrl} alt={item.title} />
                   </div>
                   <div className="summary-item__info">

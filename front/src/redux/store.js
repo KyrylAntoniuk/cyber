@@ -4,8 +4,8 @@ import filter from "./slices/filterSlice";
 import wishlist from "./slices/wishlistSlice";
 import cart from "./slices/cartSlice";
 
-import user from "./slices/userSlice";
+import authReducer from "./slices/userSlice"
 
 export const store = configureStore({
-  reducer: { product, filter, wishlist, cart, user },
+  reducer: { product, filter, wishlist, cart, auth: authReducer },
 });

@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-// ВАЖНО: Импортируем действие отправки
-import { fetchAddAddress } from "../../redux/slices/userSlice"; 
+// ВАЖНО: Импортируем универсальное действие обновления профиля
+import { fetchUpdateUser } from "../../redux/slices/userSlice"; 
 import AdressSelectorItem from "./AdressSelectorItem";
 import "../../SCSS/components/adressSelector.scss";
 
@@ -10,18 +10,19 @@ import closeSvg from "../../assets/Close.svg";
 import DoneSvg from "../../assets/Done.svg";
 import PlusSvg from "../../assets/Plus.svg";
 
-export default function AdressSelector({ onSelect }) {
+export default function AdressSelector({ onSelect, selectedAddress }) {
   const dispatch = useDispatch();
   const [addAdressButton, setAddAdressButton] = React.useState(false);
   
-  const { data } = useSelector((state) => state.user);
+  const { data } = useSelector((state) => state.auth); // Обычно auth, но проверьте ваш slice name (user или auth)
+  
   // Безопасно получаем список адресов
-  const list = data?.addressList || data?.adressList || [];
+  const list = data?.addressList || [];
 
   const [updateAderss, setUpdateAdress] = React.useState({
-    adressName: "",
+    addressName: "", // Исправил опечатку: adressName -> addressName (чтобы совпадало с БД)
     tag: "home",
-    adress: "",
+    address: "",     // Само поле адреса
     postCode: "",
     phoneNumber: ""
   });
@@ -34,51 +35,63 @@ export default function AdressSelector({ onSelect }) {
     }));
   };
 
-  // --- ВОТ ЭТА ФУНКЦИЯ БЫЛА У ВАС СТАРОЙ ---
   const handleUpdate = async () => {
       // 1. Проверка на пустоту
-      if (!updateAderss.adressName || !updateAderss.adress) {
+      if (!updateAderss.addressName || !updateAderss.address) {
           alert("Пожалуйста, заполните название и адрес!");
           return;
       }
 
       try {
-          console.log("Отправка запроса...");
-          // 2. ОТПРАВЛЯЕМ ДАННЫЕ НА СЕРВЕР
-          await dispatch(fetchAddAddress(updateAderss));
+          console.log("Добавление адреса...");
           
-          alert("Адрес успешно добавлен!");
+          // 2. Создаем новый массив адресов (старые + новый)
+          const newAddressList = [...list, updateAderss];
+
+          // 3. Отправляем ВЕСЬ обновленный массив на сервер через fetchUpdateUser
+          const result = await dispatch(fetchUpdateUser({ addressList: newAddressList }));
           
-          // 3. Закрываем окно и чистим поля
-          setAddAdressButton(false);
-          setUpdateAdress({
-            adressName: "",
-            tag: "home",
-            adress: "",
-            postCode: "",
-            phoneNumber: ""
-          });
+          if (result.meta.requestStatus === 'fulfilled') {
+             alert("Адрес успешно добавлен!");
+             setAddAdressButton(false);
+             setUpdateAdress({
+                addressName: "",
+                tag: "home",
+                address: "",
+                postCode: "",
+                phoneNumber: ""
+             });
+          } else {
+             alert("Не удалось добавить адрес.");
+          }
+
       } catch (error) {
           console.error(error);
           alert("Ошибка при сохранении адреса");
       }
   };
-  // -----------------------------------------
+
+  // Функция удаления (передаем её в AdressSelectorItem)
+  const handleRemove = (indexToRemove) => {
+     if(window.confirm('Удалить этот адрес?')) {
+        const newAddressList = list.filter((_, i) => i !== indexToRemove);
+        dispatch(fetchUpdateUser({ addressList: newAddressList }));
+     }
+  };
 
   return (
-    <div>
+    <div className="address-selector-wrapper">
       <h2>Select Address</h2>
       <div className="list-container">
         {list.length > 0 ? (
-          list.map((item) => (
-            <div key={item._id || item.id} onClick={() => onSelect && onSelect(item)}>
+          list.map((item, index) => (
+            // Используем индекс как ключ, если нет _id (для новых адресов)
+            <div key={item._id || index} style={{ marginBottom: '10px' }}>
                <AdressSelectorItem
-                  id={item._id || item.id}
-                  adressName={item.adressName || item.addressName}
-                  tag={item.tag}
-                  adress={item.adress || item.address}
-                  postCode={item.postCode}
-                  phoneNumber={item.phoneNumber}
+                 address={item} // Передаем весь объект
+                 isSelected={selectedAddress === item} // Проверка выбран ли он
+                 onSelect={() => onSelect && onSelect(item)}
+                 onRemove={() => handleRemove(index)}
                />
             </div>
           ))
@@ -98,14 +111,14 @@ export default function AdressSelector({ onSelect }) {
       </div>
 
       {addAdressButton ? (
-        <div className="adress-change-item ">
+        <div className="adress-change-item">
           <div className="items-change">
             <div className="adress-name-change-wrapper">
               <input
                 className="change-section-input"
                 type="text"
-                name="adressName"
-                value={updateAderss.adressName}
+                name="addressName" // Исправлено имя поля
+                value={updateAderss.addressName}
                 onChange={handleInputChange}
                 placeholder="Name (e.g. Home)"
               />
@@ -124,10 +137,10 @@ export default function AdressSelector({ onSelect }) {
               <input
                 className="change-section-input"
                 type="text"
-                name="adress"
-                value={updateAderss.adress}
+                name="address"
+                value={updateAderss.address}
                 onChange={handleInputChange}
-                placeholder="Address"
+                placeholder="Full Address"
               />
               <input
                 className="change-section-input"
@@ -148,7 +161,6 @@ export default function AdressSelector({ onSelect }) {
             />
           </div>
           <div className="button-wrapper">
-            {/* Кнопка вызывает handleUpdate */}
             <button onClick={handleUpdate}>
               <img src={DoneSvg} alt="Save" />
             </button>

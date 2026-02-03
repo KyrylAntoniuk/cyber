@@ -2,6 +2,37 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 
+export const updateMe = async (req, res) => {
+  try {
+    // req.userId мы получаем из checkAuth (расшифрованного токена)
+    const userId = req.userId;
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      {
+        fullName: req.body.fullName,
+        avatarUrl: req.body.avatarUrl,
+        addressList: req.body.addressList, // Обновляем весь список адресов
+        paymentList: req.body.paymentList, // Обновляем весь список карт
+      },
+      { new: true } // Вернуть уже обновленный документ
+    );
+
+    if (!updatedUser) {
+        return res.status(404).json({ message: 'Пользователь не найден' });
+    }
+
+    const { passwordHash, ...userData } = updatedUser._doc;
+    res.json(userData);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не удалось обновить профиль',
+    });
+  }
+};
+
 export const register = async (req, res) => {
   try {
     const password = req.body.password;
