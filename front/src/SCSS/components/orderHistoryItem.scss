@@ -1,0 +1,89 @@
+.order-history-item {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+
+    .order-id {
+      display: flex;
+      flex-direction: column;
+      font-weight: 600;
+      .id {
+        font-size: 12px;
+        color: #999;
+        font-weight: normal;
+      }
+    }
+
+    .order-status {
+      padding: 5px 12px;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  }
+
+  .order-body {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    
+    @media (max-width: 600px) {
+        flex-direction: column;
+    }
+
+    .order-products {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      
+      .mini-product img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 5px;
+      }
+    }
+
+    .order-details {
+       font-size: 14px;
+       .detail-row {
+           margin-bottom: 5px;
+           span { color: #888; margin-right: 5px; }
+       }
+    }
+  }
+
+  .order-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+
+    .total-price {
+        font-weight: bold;
+    }
+  }
+}

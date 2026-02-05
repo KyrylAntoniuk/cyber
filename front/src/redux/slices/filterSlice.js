@@ -1,58 +1,66 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  // Лучше получать это с сервера, но пока оставим как есть
   availableFilters: {
     brand: ["Apple", "Samsung", "Xiaomi"],
-    "battery capacity": ["3000 mAh", "4000 mAh", "5000 mAh"],
-    "Screen type": ["AMOLED", "LCD", "IPS"],
-    "Screen diagonal": ['6.1"', '6.5"', '6.8"'],
-    "Protection class": ["IP67", "IP68"],
-    "Built-in memory": ["64GB", "128GB", "256GB"],
+    batteryCapacity: ["3000 mAh", "4000 mAh", "5000 mAh"], // camelCase для ключей удобнее
+    screenType: ["AMOLED", "LCD", "IPS"],
+    screenDiagonal: ['6.1"', '6.5"', '6.8"'],
+    protectionClass: ["IP67", "IP68"],
+    builtInMemory: ["64GB", "128GB", "256GB"],
   },
-  selectedFilters: {},
-  serchValue: "",
+  selectedFilters: {}, // Структура: { brand: ["Apple"], screenType: ["IPS", "LCD"] }
+  searchValue: "", // Исправили serchValue -> searchValue
 };
 
 const filterSlice = createSlice({
   name: "filter",
   initialState,
   reducers: {
-    setvailableFilters(state, action) {
+    setAvailableFilters(state, action) {
       state.availableFilters = action.payload;
     },
     setFilterValue(state, action) {
       const { filterName, value, checked } = action.payload;
+      
+      // Инициализируем массив, если его нет
       if (!state.selectedFilters[filterName]) {
         state.selectedFilters[filterName] = [];
       }
-      const values = state.selectedFilters[filterName];
-
+      
       if (checked) {
-        if (!values.includes(value)) {
-          values.push(value);
+        // Добавляем значение, если его нет
+        if (!state.selectedFilters[filterName].includes(value)) {
+          state.selectedFilters[filterName].push(value);
         }
       } else {
-        state.selectedFilters[filterName] = values.filter((v) => v !== value);
+        // Удаляем значение
+        state.selectedFilters[filterName] = state.selectedFilters[filterName].filter(
+          (v) => v !== value
+        );
+        
+        // Если массив пустой, удаляем ключ (чтобы не отправлять пустой фильтр на сервер)
+        if (state.selectedFilters[filterName].length === 0) {
+          delete state.selectedFilters[filterName];
+        }
       }
     },
     clearFilters(state) {
       state.selectedFilters = {};
+      state.searchValue = "";
     },
-    setSerchValue(state, action) {
-      state.serchValue = action.payload;
+    setSearchValue(state, action) {
+      state.searchValue = action.payload;
     },
-    // setFilters(state, action) {
-    //   state.selectedFilters = action.payload.selectedFilters;
-    //   state.serchValue = action.payload.serchValue;
-    // },
   },
 });
 
 export const {
-  setAvalibaleFilters,
+  setAvailableFilters,
   setFilterValue,
   clearFilters,
-  setSerchValue,
-  setFilters,
+  setSearchValue,
 } = filterSlice.actions;
+
 export default filterSlice.reducer;

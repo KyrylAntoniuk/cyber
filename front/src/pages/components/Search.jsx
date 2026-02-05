@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../../axios"; 
-import { setSerchValue } from "../../redux/slices/filterSlice"; // Сохраняем вашу опечатку в названии
+import { setSearchValue } from "../../redux/slices/filterSlice"; // Сохраняем вашу опечатку в названии
 import "../../SCSS/components/search.scss";
 
 export default function Search() {
@@ -66,7 +66,7 @@ export default function Search() {
 
   const handleChange = (e) => {
     const value = e.target.value;
-    dispatch(setSerchValue(value)); // Обновляем Redux
+    dispatch(setSearchValue(value)); // Обновляем Redux
 
     // Логика отображения выпадающего списка
     if (location.pathname !== "/products") {
@@ -79,7 +79,7 @@ export default function Search() {
   const handleItemClick = (id) => {
     setIsOpen(false);
     setFetchedProducts([]);
-    dispatch(setSerchValue(""));
+    dispatch(setSearchValue(""));
     navigate(`/product/${id}`);
   };
 
