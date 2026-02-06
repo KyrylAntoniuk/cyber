@@ -1,76 +1,98 @@
 import ProductModel from '../models/Product.js';
+import FilterModel from '../models/Filter.js'; // Не забудьте, что модель Filter должна существовать!
 
-// Получение всех товаров (с фильтрацией, сортировкой и пагинацией)
+// 1. Получение фильтров (теперь берем из таблицы Filter)
 export const getFilters = async (req, res) => {
   try {
-    // Выполняем запросы параллельно для скорости
-    const [brands, screenTypes, memories, batteryCapacities] = await Promise.all([
-      ProductModel.distinct('brand'), // Поле brand
-      ProductModel.distinct('screenType'), // Поле screenType
-      ProductModel.distinct('options.builtInMemory'), // Поле внутри объекта options
-      ProductModel.distinct('characteristics.Battery capacity') // Поле внутри characteristics (если ключи с пробелами)
-    ]);
+    const filters = await FilterModel.find();
 
-    // Формируем ответ. Ключи должны совпадать с тем, что ждет фронтенд (camelCase)
-    res.json({
-      brand: brands.filter(Boolean).sort(), // filter(Boolean) убирает null/undefined
-      screenType: screenTypes.filter(Boolean).sort(),
-      builtInMemory: memories.filter(Boolean).sort((a, b) => parseInt(a) - parseInt(b)), // Сортировка памяти числовая (64, 128...)
-      batteryCapacity: batteryCapacities.filter(Boolean).sort(),
+    // Преобразуем массив объектов в удобный объект:
+    // { brand: ["Apple", ...], screenType: ["AMOLED", ...] }
+    const response = {};
+    
+    filters.forEach(f => {
+      // Если нужно сортировать опции (например, числа 64GB, 128GB), 
+      // это лучше делать либо при создании (seed), либо здесь кастомной функцией.
+      // Пока отдаем как есть в базе.
+      response[f.queryKey] = f.options; 
     });
 
+    res.json(response);
   } catch (err) {
     console.log(err);
-    res.status(500).json({
-      message: 'Не удалось получить фильтры',
-    });
+    res.status(500).json({ message: 'Не удалось получить фильтры' });
   }
 };
 
+// 2. Получение всех товаров (Динамическая фильтрация)
 export const getAll = async (req, res) => {
   try {
-    const { search, category, sortBy, limit, page } = req.query;
+    // Отделяем служебные параметры от параметров фильтрации
+    const { search, limit, page, sortBy, ...queryParams } = req.query;
 
-    // 1. Формируем фильтр
-    let filter = {};
-    
-    // Поиск по названию (case-insensitive)
-    if (search) {
-      filter.productName = { $regex: search, $options: 'i' };
-    }
-    
-    // Фильтр по категории (если передан)
-    if (category) {
-      filter.category = category;
-    }
-
-    // 2. Инициализируем запрос
-    let query = ProductModel.find(filter);
-
-    // 3. Сортировка
-    if (sortBy === 'price_asc') query = query.sort({ price: 1 });
-    else if (sortBy === 'price_desc') query = query.sort({ price: -1 });
-    else if (sortBy === 'rating') query = query.sort({ rating: -1 });
-    else if (sortBy === 'newest') query = query.sort({ createdAt: -1 });
-    else query = query.sort({ createdAt: -1 }); // Сортировка по умолчанию (новые сверху)
-
-    // 4. Пагинация
+    // Настройки пагинации
     const pageNumber = parseInt(page) || 1;
-    const limitNumber = parseInt(limit) || 8; // По умолчанию 8 товаров
+    const limitNumber = parseInt(limit) || 8;
     const skip = (pageNumber - 1) * limitNumber;
 
-    // Применяем пагинацию к запросу
-    query = query.skip(skip).limit(limitNumber);
+    // --- ДИНАМИЧЕСКОЕ ПОСТРОЕНИЕ ЗАПРОСА ---
+    
+    // 1. Загружаем список доступных фильтров, чтобы знать правильные ключи БД
+    const availableFilters = await FilterModel.find();
+    
+    // Создаем карту: queryKey (URL) -> dbKey (MongoDB Path)
+    // Пример: { builtInMemory: 'options.builtInMemory', brand: 'brand' }
+    const fieldMap = {};
+    availableFilters.forEach(f => {
+      fieldMap[f.queryKey] = f.dbKey;
+    });
 
-    // 5. Выполняем запросы (получение товаров и подсчет общего кол-ва)
-    const products = await query.exec();
-    const totalDocs = await ProductModel.countDocuments(filter);
+    let dbQuery = {};
 
-    // 6. Возвращаем ответ в формате, который ждет наш Redux (productSlice)
+    // 2. Поиск по тексту (если есть)
+    if (search) {
+      dbQuery.productName = { $regex: search, $options: 'i' };
+    }
+
+    // 3. Проходимся по всем параметрам, пришедшим с фронтенда
+    Object.keys(queryParams).forEach((key) => {
+      const value = queryParams[key];
+      
+      // Проверяем, является ли этот параметр известным фильтром
+      if (fieldMap[key] && value) {
+        // Фронт шлет массив через запятую: "Apple,Samsung"
+        const valuesArray = value.split(','); 
+        
+        if (valuesArray.length > 0) {
+          // Добавляем условие: поле в БД должно быть ОДНИМ ИЗ значений (оператор $in)
+          dbQuery[fieldMap[key]] = { $in: valuesArray };
+        }
+      }
+    });
+
+    // Логирование запроса для отладки (видно в терминале сервера)
+    console.log("MongoDB Query:", JSON.stringify(dbQuery, null, 2));
+
+    // 4. Сортировка
+    let sortOptions = { createdAt: -1 }; // По умолчанию: новые сверху
+    if (sortBy === 'price_asc') sortOptions = { price: 1 };
+    else if (sortBy === 'price_desc') sortOptions = { price: -1 };
+    else if (sortBy === 'rating') sortOptions = { rating: -1 };
+    else if (sortBy === 'newest') sortOptions = { createdAt: -1 };
+
+    // 5. Выполнение запросов
+    const products = await ProductModel.find(dbQuery)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNumber)
+      .exec();
+
+    const totalDocs = await ProductModel.countDocuments(dbQuery);
+
     res.json({
-      items: products, // Важно: Redux ждет поле 'items'
+      items: products,
       totalItems: totalDocs,
-      totalPages: Math.ceil(totalDocs / limitNumber), // Считаем кол-во страниц
+      totalPages: Math.ceil(totalDocs / limitNumber),
       currentPage: pageNumber,
     });
 
@@ -84,14 +106,10 @@ export const getAll = async (req, res) => {
 export const getOne = async (req, res) => {
   try {
     const productId = req.params.id;
-    // .findOneAndUpdate с инкрементом viewsCount — если нужно считать просмотры
-    // Либо просто .findById(productId)
     const product = await ProductModel.findById(productId);
-
     if (!product) {
       return res.status(404).json({ message: 'Товар не найден' });
     }
-
     res.json(product);
   } catch (err) {
     console.log(err);
@@ -99,7 +117,7 @@ export const getOne = async (req, res) => {
   }
 };
 
-// Создание товара (для админки или скриптов)
+// Создание товара
 export const create = async (req, res) => {
   try {
     const doc = new ProductModel({
@@ -108,8 +126,7 @@ export const create = async (req, res) => {
       img: req.body.img,
       category: req.body.category,
       rating: req.body.rating,
-      text: req.body.text, // Описание
-      // Остальные поля из модели...
+      text: req.body.text,
       brand: req.body.brand,
       screenType: req.body.screenType,
       characteristics: req.body.characteristics,
@@ -118,7 +135,6 @@ export const create = async (req, res) => {
     });
 
     const product = await doc.save();
-
     res.json(product);
   } catch (err) {
     console.log(err);
@@ -130,7 +146,6 @@ export const create = async (req, res) => {
 export const remove = async (req, res) => {
   try {
     const productId = req.params.id;
-
     const result = await ProductModel.findOneAndDelete({ _id: productId });
 
     if (!result) {
@@ -160,7 +175,9 @@ export const update = async (req, res) => {
             price: req.body.price,
             img: req.body.img,
             text: req.body.text,
-            // Добавьте остальные поля, которые разрешено обновлять
+            brand: req.body.brand,
+            category: req.body.category,
+            // Добавьте остальные поля при необходимости
         },
       }
     );
