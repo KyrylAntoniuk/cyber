@@ -1,6 +1,32 @@
 import ProductModel from '../models/Product.js';
 
 // Получение всех товаров (с фильтрацией, сортировкой и пагинацией)
+export const getFilters = async (req, res) => {
+  try {
+    // Выполняем запросы параллельно для скорости
+    const [brands, screenTypes, memories, batteryCapacities] = await Promise.all([
+      ProductModel.distinct('brand'), // Поле brand
+      ProductModel.distinct('screenType'), // Поле screenType
+      ProductModel.distinct('options.builtInMemory'), // Поле внутри объекта options
+      ProductModel.distinct('characteristics.Battery capacity') // Поле внутри characteristics (если ключи с пробелами)
+    ]);
+
+    // Формируем ответ. Ключи должны совпадать с тем, что ждет фронтенд (camelCase)
+    res.json({
+      brand: brands.filter(Boolean).sort(), // filter(Boolean) убирает null/undefined
+      screenType: screenTypes.filter(Boolean).sort(),
+      builtInMemory: memories.filter(Boolean).sort((a, b) => parseInt(a) - parseInt(b)), // Сортировка памяти числовая (64, 128...)
+      batteryCapacity: batteryCapacities.filter(Boolean).sort(),
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не удалось получить фильтры',
+    });
+  }
+};
+
 export const getAll = async (req, res) => {
   try {
     const { search, category, sortBy, limit, page } = req.query;

@@ -1,56 +1,58 @@
-import React from "react";
+import React, { useEffect } from "react"; // Добавили useEffect
 import { useDispatch, useSelector } from "react-redux";
-import { setFilterValue, clearFilters } from "../../redux/slices/filterSlice";
+// Импортируем новый thunk fetchFilters
+import { setFilterValue, clearFilters, fetchFilters } from "../../redux/slices/filterSlice";
 import "../../SCSS/components/fillters.scss";
 
-// SVG (проверьте пути)
 import expondMoreSvg from "../../assets/expand_more.svg";
 import expendLessSvg from "../../assets/expand_less.svg";
 import FilterSvg from "../../assets/filters.svg";
 
-// Вспомогательная функция для красивого отображения названий фильтров
-// Например: "batteryCapacity" -> "Battery Capacity"
+// Функция форматирования camelCase в красивый текст
 const formatLabel = (str) => {
-    return str
-      .replace(/([A-Z])/g, ' $1') // Добавляем пробел перед заглавными
-      .replace(/^./, (str) => str.toUpperCase()); // Делаем первую букву заглавной
+  return str
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (str) => str.toUpperCase());
 };
 
 function Filters() {
   const dispatch = useDispatch();
   
-  // Достаем доступные и выбранные фильтры
-  const { availableFilters, selectedFilters } = useSelector((state) => state.filter);
+  const { availableFilters, selectedFilters, status } = useSelector((state) => state.filter);
   
   const [openFilters, setOpenFilters] = React.useState({});
-  const [visible, setVisible] = React.useState(false); // Для мобильной версии
+  const [visible, setVisible] = React.useState(false);
 
-  // Открытие/закрытие аккордеона фильтра
+  // ЗАПРОС ФИЛЬТРОВ ПРИ МОНТИРОВАНИИ
+  useEffect(() => {
+    // Запрашиваем фильтры, только если они пустые (оптимизация)
+    // или можно запрашивать всегда, чтобы были свежие
+    dispatch(fetchFilters());
+  }, [dispatch]);
+
   const toggleFilter = (key) => {
-    setOpenFilters((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    setOpenFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Обработчик чекбокса
   const handleCheckboxChange = (filterName, value, e) => {
-      // Останавливаем всплытие, чтобы не сработал клик на родительский div (аккордеон)
-      e.stopPropagation(); 
-      dispatch(
-        setFilterValue({
-          filterName,
-          value,
-          checked: e.target.checked,
-        })
-      );
+    e.stopPropagation();
+    dispatch(
+      setFilterValue({
+        filterName,
+        value,
+        checked: e.target.checked,
+      })
+    );
   };
+
+  if (status === 'loading' && Object.keys(availableFilters).every(k => availableFilters[k].length === 0)) {
+     return <div className="filters-container">Загрузка фильтров...</div>;
+  }
 
   return (
     <div className="filters-container">
       <div className="filters-top-bar">
           <h1>Filters</h1>
-          {/* Кнопка сброса (показываем, если есть выбранные фильтры) */}
           {Object.keys(selectedFilters).length > 0 && (
              <button className="reset-btn" onClick={() => dispatch(clearFilters())}>
                  Reset all
@@ -58,22 +60,20 @@ function Filters() {
           )}
       </div>
 
-      {/* Кнопка для мобилок */}
       <button className="burger" onClick={() => setVisible(!visible)}>
         <span>Filters</span>
         <img src={FilterSvg} alt="filter icon" />
       </button>
 
-      {/* Список фильтров */}
       <div className={`filters-list ${visible ? "visible" : ""}`}>
         {Object.entries(availableFilters).map(([filterKey, options]) => {
-          // Проверяем, открыт ли этот фильтр
-          // (можно сделать все открытыми по умолчанию, если добавить ! в условие)
+          // Если опций для фильтра нет (пустой массив с бэка), не показываем его
+          if (!options || options.length === 0) return null;
+
           const isOpen = openFilters[filterKey] ?? false;
 
           return (
             <div key={filterKey} className="filter-group">
-              {/* Заголовок фильтра (аккордеон) */}
               <div 
                 className="filter-header" 
                 onClick={() => toggleFilter(filterKey)}
@@ -82,15 +82,12 @@ function Filters() {
                 <img 
                     src={isOpen ? expendLessSvg : expondMoreSvg} 
                     alt="arrow" 
-                    className="arrow-icon"
                 />
               </div>
 
-              {/* Опции (чекбоксы) */}
               {isOpen && (
                 <div className="filter-options">
                   {options.map((value, i) => {
-                      // Проверяем, выбран ли этот чекбокс в Redux
                       const isChecked = selectedFilters[filterKey]?.includes(value);
 
                       return (
@@ -98,7 +95,7 @@ function Filters() {
                           <input
                             type="checkbox"
                             value={value}
-                            checked={isChecked || false} // ВАЖНО: Привязываем checked к Redux
+                            checked={isChecked || false}
                             onChange={(e) => handleCheckboxChange(filterKey, value, e)}
                           />
                           <span className="checkmark"></span>
