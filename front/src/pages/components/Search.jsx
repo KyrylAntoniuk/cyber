@@ -96,7 +96,7 @@ export default function Search() {
         }}
       />
       
-      {isOpen && fetchedProducts.length > 0 && (
+      {isOpen && fetchedProducts.length > 0 (  // add page locaction check
         <div className="preview-products">
           {fetchedProducts.map((item) => (
             <div
