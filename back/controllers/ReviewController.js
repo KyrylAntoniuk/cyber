@@ -26,7 +26,7 @@ export const create = async (req, res) => {
       return res.status(404).json({ message: "Товар не найден" });
     }
 
-    // 2. Проверяем, оставлял ли пользователь уже отзыв (БД вернет ошибку из-за индекса, но лучше проверить явно)
+    // 2. Проверяем, оставлял ли пользователь уже отзыв
     const existingReview = await ReviewModel.findOne({
       product: productId,
       user: req.userId,
@@ -45,22 +45,26 @@ export const create = async (req, res) => {
       comment,
     });
 
-    await doc.save();
+    const savedReview = await doc.save();
 
     // 4. ПЕРЕСЧЕТ РЕЙТИНГА ТОВАРА
     // Получаем все отзывы этого товара
     const allReviews = await ReviewModel.find({ product: productId });
     
     const newNumReviews = allReviews.length;
-    const newRating =
-      allReviews.reduce((acc, item) => item.rating + acc, 0) / newNumReviews;
+    
+    // Защита от деления на 0 на всякий случай
+    const newRating = newNumReviews > 0 
+      ? allReviews.reduce((acc, item) => item.rating + acc, 0) / newNumReviews
+      : 0;
 
-    // Обновляем товар
+    // Обновляем товар (при желании можно округлить рейтинг: Math.round(newRating * 10) / 10)
     product.numReviews = newNumReviews;
     product.rating = newRating;
     await product.save();
 
-    res.json({ success: true, message: "Отзыв добавлен" });
+    // ВАЖНО: Возвращаем сам отзыв на фронтенд, чтобы сразу отрендерить его в списке!
+    res.status(201).json(savedReview);
 
   } catch (err) {
     console.log(err);

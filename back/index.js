@@ -7,7 +7,7 @@ import productRoutes from './routes/products.js';
 import authRoutes from './routes/auth.js';
 import wishlistRoutes from './routes/wishlist.js';
 import orderRoutes from './routes/orders.js';
-import reviewRoutes from "./routes/reviews.js"
+import reviewRoutes from './routes/reviews.js';
 // import orderRoutes from './routes/orders.js'; // Если успеете сделать заказы
 
 dotenv.config();
@@ -30,7 +30,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/reviews', reviewRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 
 app.listen(PORT, (err) => {

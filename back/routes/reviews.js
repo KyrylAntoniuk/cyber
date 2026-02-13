@@ -1,13 +1,11 @@
 import express from 'express';
-import checkAuth from '../utils/checkAuth.js';
-import * as ReviewController from '../controllers/ReviewController.js';
+import { create, getByProduct } from '../controllers/ReviewController.js';
+import checkAuth from '../utils/checkAuth.js'; // твой мидлвар авторизации
 
 const router = express.Router();
 
-// GET /reviews/product/:productId - Получить отзывы товара
-router.get('/product/:productId', ReviewController.getByProduct);
-
-// POST /reviews/product/:productId - Создать отзыв (нужна авторизация)
-router.post('/product/:productId', checkAuth, ReviewController.create);
+// Обрати внимание на путь! Он должен быть '/product/:productId'
+router.post('/product/:productId', checkAuth, create);
+router.get('/product/:productId', getByProduct);
 
 export default router;
