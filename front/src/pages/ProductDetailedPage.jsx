@@ -1,58 +1,59 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "../axios"; // Ваш настроенный axios
-import "../SCSS/pages/productDetailedPage.scss";
 
-import {
-  addWishlistItem,
-  removeWishlistItem,
-} from "../redux/slices/wishlistSlice";
+// Redux Actions
+import { fetchOneProduct, clearCurrentProduct } from "../redux/slices/productSlice";
+import { addWishlistItem, removeWishlistItem } from "../redux/slices/wishlistSlice";
 import { addItem } from "../redux/slices/cartSlice";
+
+// Components & Styles
+import Reviews from "./components/Reviews"; // Импорт компонента отзывов
+import "../SCSS/pages/productDetailedPage.scss";
 
 function ProductDetailedPage() {
   const dispatch = useDispatch();
   const { id } = useParams();
-  
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  
-  // Стейт для выбранных опций (например: { color: "#000000", builtInMemory: "128GB" })
-  const [selectedOptions, setSelectedOptions] = useState({});
 
+  // Достаем товар из Redux (теперь он называется currentProduct)
+  // Мы переименовываем его в 'product' для удобства использования в коде ниже
+  const { currentProduct: product, status } = useSelector((state) => state.product);
   const { wishlistItems } = useSelector((state) => state.wishlist);
 
+  // Стейт для выбранных опций
+  const [selectedOptions, setSelectedOptions] = useState({});
+
+  // 1. Загружаем товар при открытии страницы
   useEffect(() => {
-    async function fetchOneProduct() {
-      try {
-        const { data } = await axios.get(`/products/${id}`);
-        setProduct(data);
-        
-        // Автоматически выбираем первые опции по умолчанию
-        if (data.options) {
-          const initialOptions = {};
-          Object.entries(data.options).forEach(([key, values]) => {
-            if (values && values.length > 0) {
-              initialOptions[key] = values[0];
-            }
-          });
-          setSelectedOptions(initialOptions);
+    dispatch(fetchOneProduct(id));
+
+    // Очищаем данные при уходе со страницы
+    return () => {
+      dispatch(clearCurrentProduct());
+    };
+  }, [dispatch, id]);
+
+  // 2. Автоматически выбираем первые опции, когда товар загрузился
+  useEffect(() => {
+    if (product && product.options) {
+      const initialOptions = {};
+      Object.entries(product.options).forEach(([key, values]) => {
+        if (values && Array.isArray(values) && values.length > 0) {
+          initialOptions[key] = values[0];
         }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Ошибка при загрузке товара", error);
-        setLoading(false);
-      }
+      });
+      setSelectedOptions(initialOptions);
     }
-    fetchOneProduct();
-  }, [id]);
+  }, [product]);
 
-  if (loading) return <div className="container"><h1>Loading...</h1></div>;
-  if (!product) return <div className="container"><h1>Product not found</h1></div>;
+  // Отображение загрузки или ошибки
+  if (!product) {
+      return <div className="container" style={{padding: '50px'}}><h1>Loading...</h1></div>;
+  }
 
-  // Проверка вишлиста (используем id или _id)
-  const productId = product.id || product._id;
+  const productId = product._id || product.id;
+  
+  // Проверка вишлиста
   const isInWishlist = wishlistItems.some(
     (item) => (item.product ? item.product._id === productId : item.itemId === productId)
   );
@@ -72,10 +73,10 @@ function ProductDetailedPage() {
   const onClickAdd = () => {
     const item = {
       id: productId,
-      title: product.productName, // Используем правильное поле из вашей БД
+      title: product.productName,
       imageUrl: product.img,
       price: product.price,
-      options: selectedOptions, // Передаем выбранные опции в корзину
+      options: selectedOptions,
     };
     dispatch(addItem(item));
     alert("Added to cart!");
@@ -92,9 +93,18 @@ function ProductDetailedPage() {
         {/* Правая часть: Инфо */}
         <div className="right-secion">
           <h1 className="product-name">{product.productName}</h1>
-          <span className="product-price">{product.price.toLocaleString()} ₴</span>
+          
+          <div className="product-meta" style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
+             <span className="product-price">{product.price.toLocaleString()} ₴</span>
+             {/* Отображение рейтинга */}
+             <div className="rating" style={{ color: '#FFD700', fontSize: '18px' }}>
+                 {"★".repeat(Math.round(product.rating || 0))}
+                 {"☆".repeat(5 - Math.round(product.rating || 0))}
+                 <span style={{ color: '#999', fontSize: '14px', marginLeft: '5px' }}>({product.numReviews} reviews)</span>
+             </div>
+          </div>
 
-          {/* Блок ОПЦИЙ (Цвета, Память и т.д.) */}
+          {/* Блок ОПЦИЙ */}
           {product.options && (
             <div className="options">
               {Object.entries(product.options).map(([key, values]) => (
@@ -105,7 +115,6 @@ function ProductDetailedPage() {
                   <div className="option-values" style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
                     {values.map((val) => {
                       const isActive = selectedOptions[key] === val;
-                      // Если это цвет, рисуем кружок
                       if (key === "color") {
                         return (
                           <div
@@ -120,7 +129,6 @@ function ProductDetailedPage() {
                           />
                         );
                       }
-                      // Иначе рисуем кнопку (например, память 128GB)
                       return (
                         <div
                           key={val}
@@ -144,7 +152,7 @@ function ProductDetailedPage() {
             </div>
           )}
 
-          {/* Основные Характеристики (Screen size, CPU...) */}
+          {/* Характеристики */}
           <div className="characteristics" style={{ marginTop: '20px' }}>
             {product.characteristics && Object.entries(product.characteristics).map(([key, value]) => (
               <div key={key} className="characteristics-item" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', padding: '5px 0' }}>
@@ -169,9 +177,8 @@ function ProductDetailedPage() {
       {/* Описание и Детали */}
       <div className="decr-section-wrapper">
         <h2>Description</h2>
-        <p style={{ lineHeight: '1.6', marginBottom: '30px' }}>{product.description}</p>
+        <p style={{ lineHeight: '1.6', marginBottom: '30px' }}>{product.text || product.description}</p>
         
-        {/* Сложные детали из массива details */}
         {product.details && product.details.map((detailGroup, index) => (
           <div key={index} className="details-group">
             {Object.entries(detailGroup).map(([categoryName, specsArray]) => (
@@ -179,7 +186,7 @@ function ProductDetailedPage() {
                 <h3 style={{ textTransform: "capitalize", borderBottom: '2px solid black', display: 'inline-block' }}>
                   {categoryName}
                 </h3>
-                {specsArray.map((specItem, idx) => (
+                {Array.isArray(specsArray) && specsArray.map((specItem, idx) => (
                   <div key={idx} style={{ marginTop: '10px' }}>
                     {Object.entries(specItem).map(([prop, val]) => (
                       <div key={prop} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '5px 0', borderBottom: '1px solid #f0f0f0' }}>
@@ -194,6 +201,12 @@ function ProductDetailedPage() {
           </div>
         ))}
       </div>
+
+      {/* Секция Отзывов (НОВОЕ) */}
+      <div className="reviews-section-wrapper" style={{ marginTop: '50px' }}>
+          <Reviews productId={productId} />
+      </div>
+
     </div>
   );
 }
