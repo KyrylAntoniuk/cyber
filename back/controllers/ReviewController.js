@@ -71,3 +71,48 @@ export const create = async (req, res) => {
     res.status(500).json({ message: "Не удалось добавить отзыв" });
   }
 };
+
+export const update = async (req, res) => {
+  try {
+    const reviewId = req.params.id; // ID самого отзыва
+    const { rating, comment } = req.body;
+
+    // 1. Находим отзыв в БД
+    const review = await ReviewModel.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Отзыв не найден" });
+    }
+
+    // 2. Проверяем, что текущий пользователь — автор отзыва
+    // req.userId берется из твоего checkAuth мидлвара
+    if (review.user.toString() !== req.userId) {
+      return res.status(403).json({ message: "У вас нет прав для изменения этого отзыва" });
+    }
+
+    // 3. Обновляем данные
+    if (rating) review.rating = Number(rating);
+    if (comment !== undefined) review.comment = comment;
+    
+    const updatedReview = await review.save();
+
+    // 4. ПЕРЕСЧЕТ РЕЙТИНГА ТОВАРА (т.к. оценка могла измениться)
+    const allReviews = await ReviewModel.find({ product: review.product });
+    const product = await ProductModel.findById(review.product);
+    
+    if (product) {
+      const newNumReviews = allReviews.length;
+      const newRating = newNumReviews > 0 
+        ? allReviews.reduce((acc, item) => item.rating + acc, 0) / newNumReviews
+        : 0;
+
+      product.rating = newRating;
+      await product.save();
+    }
+
+    // Возвращаем обновленный отзыв
+    res.status(200).json(updatedReview);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Не удалось обновить отзыв" });
+  }
+};
