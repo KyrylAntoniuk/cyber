@@ -83,7 +83,7 @@ export const getAll = async (req, res) => {
       .sort(sortOptions)
       .skip(skip)
       .limit(limitNumber)
-      .populate('user'); // Если нужно получить данные создателя товара
+      // .populate('user'); // Если нужно получить данные создателя товара
 
     res.json({
       items: products,

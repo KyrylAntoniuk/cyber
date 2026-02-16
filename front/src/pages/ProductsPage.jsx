@@ -14,38 +14,39 @@ const LIMIT = 8;
 function ProductPage() {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // Добавляем состояние для сортировки (по умолчанию 'rating' или то, что нравится)
+  const [sortBy, setSortBy] = useState("rating");
 
   // Получаем данные из Redux
-  const { items, status, totalPages } = useSelector((state) => state.product); // Или state.products (проверьте store.js!)
+  const { items, status, totalPages } = useSelector((state) => state.product); 
   const { selectedFilters, searchValue } = useSelector((state) => state.filter);
   const { wishlistItems } = useSelector((state) => state.wishlist);
 
-  // Сброс страницы при изменении фильтров
+  // Сброс страницы при изменении фильтров, поиска ИЛИ СОРТИРОВКИ
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedFilters, searchValue]);
+  }, [selectedFilters, searchValue, sortBy]);
 
   // --- ГЛАВНЫЙ ЗАПРОС ---
   useEffect(() => {
     const getProducts = async () => {
-      // 1. Базовые параметры
+      // 1. Базовые параметры + СОРТИРОВКА
       const params = {
         page: currentPage,
         limit: LIMIT,
         search: searchValue,
+        sortBy: sortBy, // <--- Передаем выбранную сортировку на бэкенд
       };
 
       // 2. Добавляем фильтры
-      // selectedFilters выглядит так: { brand: ["Apple", "Samsung"], builtInMemory: ["64GB"] }
       Object.entries(selectedFilters).forEach(([key, values]) => {
-        // Проверяем, что values - это массив и он не пустой
         if (Array.isArray(values) && values.length > 0) {
-            // Превращаем в строку: params.brand = "Apple,Samsung"
             params[key] = values.join(",");
         }
       });
 
-      console.log("🚀 ОТПРАВКА ЗАПРОСА С ПАРАМЕТРАМИ:", params); // <--- СМОТРИ СЮДА В КОНСОЛЬ
+      console.log("🚀 ОТПРАВКА ЗАПРОСА С ПАРАМЕТРАМИ:", params);
 
       dispatch(fetchProducts(params));
       dispatch(fetchWishlistItems());
@@ -53,36 +54,78 @@ function ProductPage() {
 
     getProducts();
     window.scrollTo(0, 0);
-  }, [currentPage, selectedFilters, searchValue, dispatch]); // Важно: selectedFilters в зависимостях
+  }, [currentPage, selectedFilters, searchValue, sortBy, dispatch]); // Добавили sortBy в зависимости
 
-  // ... (остальной код: wishlistSet, return JSX)
+  // Создаем Set для быстрой проверки избранного
   const wishlistSet = new Set(wishlistItems.map((i) => (i.product ? i.product._id : i.itemId)));
 
   return (
     <div className="container">
-      {/* ... Верхняя часть ... */}
+      {/* Верхняя часть (если есть) */}
+      
       <div className="products-container">
         <div className="Filters">
            <Filters />
         </div>
+
         <div className="items-contener">
+            {/* БЛОК СОРТИРОВКИ */}
+            <div className="sort-wrapper" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px', paddingRight: '15px' }}>
+                <span style={{ marginRight: '10px', fontWeight: 'bold' }}>Сортировать:</span>
+                <select 
+                    value={sortBy} 
+                    onChange={(e) => setSortBy(e.target.value)}
+                    style={{ padding: '5px 10px', borderRadius: '5px', border: '1px solid #ccc', cursor: 'pointer' }}
+                >
+                    <option value="rating">По рейтингу</option>
+                    <option value="price_asc">Сначала дешевые</option>
+                    <option value="price_desc">Сначала дорогие</option>
+                    <option value="reviews">По популярности</option>
+                    <option value="title">По названию (А-Я)</option>
+                </select>
+            </div>
+
             <div className="items-wrapper">
                <div className="items">
-                 {status === "loading" ? <h2>Loading...</h2> : 
-                  items.map(obj => <ProductCard key={obj._id} {...obj} isInWishlist={wishlistSet.has(obj._id)} />)
-                 }
+                 {status === "loading" ? (
+                    <h2>Loading...</h2> 
+                 ) : (
+                    items.length > 0 ? (
+                        items.map(obj => (
+                            <ProductCard 
+                                key={obj._id} 
+                                {...obj} 
+                                isInWishlist={wishlistSet.has(obj._id)} 
+                            />
+                        ))
+                    ) : (
+                        <h2>Товары не найдены</h2>
+                    )
+                 )}
                </div>
             </div>
         </div>
       </div>
+
       {/* Пагинация */}
       {totalPages > 1 && (
         <div className="pagination-wrapper">
-           <ReactPaginate 
-             pageCount={totalPages} 
+           <ReactPaginate
+             pageCount={totalPages}
              forcePage={currentPage - 1}
              onPageChange={(e) => setCurrentPage(e.selected + 1)}
-             // ... ваши классы ...
+             containerClassName="pagination"
+             activeClassName="active"
+             pageClassName="page-item"
+             pageLinkClassName="page-link"
+             previousClassName="page-item"
+             previousLinkClassName="page-link"
+             nextClassName="page-item"
+             nextLinkClassName="page-link"
+             breakClassName="page-item"
+             breakLinkClassName="page-link"
+             previousLabel="<"
+             nextLabel=">"
            />
         </div>
       )}

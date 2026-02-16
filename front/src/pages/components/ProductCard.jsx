@@ -15,18 +15,14 @@ function ProductCard(props) {
   const dispatch = useDispatch();
 
   // Логика полей:
-  // 1. ID может быть 'id' или '_id'
   const id = props.id || props._id;
-  
-  // 2. Имя может быть 'productName' (новая БД) или 'title' (старая/резервная)
   const name = props.productName || props.title || "No Name";
-  
-  // 3. Картинка может быть 'img' (новая БД) или 'imageUrl'
   const image = props.img || props.imageUrl || "";
-  console.log("image" + image)
-console.log("props.img" + props.img)
-console.log("props.imageUrl" + props.imageUrl)
   const price = props.price;
+  
+  // Достаем рейтинг (если нет, то 0)
+  const rating = props.rating || 0;
+  
   const isInWishlist = props.isInWishlist;
 
   const handleWishlist = (e) => {
@@ -40,6 +36,17 @@ console.log("props.imageUrl" + props.imageUrl)
 
   const handleClick = () => {
     if (id) navigate(`/product/${id}`);
+  };
+
+  // Вспомогательная функция для генерации звезд
+  const renderStars = (rate) => {
+    const rounded = Math.round(rate); // Округляем до целого
+    return (
+      <>
+        {"★".repeat(rounded)}
+        <span style={{ color: "#ccc" }}>{"★".repeat(5 - rounded)}</span>
+      </>
+    );
   };
 
   return (
@@ -57,6 +64,15 @@ console.log("props.imageUrl" + props.imageUrl)
       <div className="product-data" onClick={handleClick} style={{ cursor: "pointer" }}>
         <img src={image} alt={name} style={{ objectFit: "contain" }} />
         <p className="product-title">{name}</p>
+        
+        {/* Блок рейтинга */}
+        <div className="product-rating" style={{ marginBottom: '8px', color: '#ffc107', fontSize: '14px' }}>
+             {renderStars(rating)} 
+             <span style={{ color: '#000', fontSize: '12px', marginLeft: '5px' }}>
+                ({rating})
+             </span>
+        </div>
+
         <span className="product-price">{price ? price.toLocaleString() : 0} ₴</span>
       </div>
 
