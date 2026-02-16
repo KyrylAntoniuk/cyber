@@ -1,25 +1,26 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom'; // Добавил useNavigate
 
 // Redux
-import { selectIsAuth, fetchUpdateUser } from '../redux/slices/userSlice';
-import { fetchMyOrders } from '../redux/slices/orderSlice'; // Импорт экшена заказов
+import { selectIsAuth, fetchUpdateUser, logout } from '../redux/slices/userSlice'; // Добавил logout
+import { fetchMyOrders } from '../redux/slices/orderSlice';
 
 // Компоненты
-import OrderHistoryItem from './components/OrderHistoryItem'; // Импорт карточки заказа
+import OrderHistoryItem from './components/OrderHistoryItem';
 
 // Стили
 import '../SCSS/pages/userProfile.scss';
 
 const UserProfile = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Хук для навигации
   
   // Данные пользователя
   const isAuth = useSelector(selectIsAuth);
   const { data } = useSelector((state) => state.auth);
 
-  // Данные заказов (переименовываем items в orders для ясности)
+  // Данные заказов
   const { items: orders, status: ordersStatus } = useSelector((state) => state.orders);
 
   // Локальный стейт для формы адреса
@@ -36,6 +37,15 @@ const UserProfile = () => {
       dispatch(fetchMyOrders());
     }
   }, [dispatch, isAuth]);
+
+  // Логика выхода (перенесена из Header)
+  const onClickLogout = () => {
+    if (window.confirm('Вы действительно хотите выйти из аккаунта?')) {
+      dispatch(logout());
+      window.localStorage.removeItem('token');
+      navigate('/'); // Перенаправляем на главную после выхода
+    }
+  };
 
   // Проверка авторизации
   if (!isAuth && !window.localStorage.getItem('token')) {
@@ -73,7 +83,18 @@ const UserProfile = () => {
 
   return (
     <div className="container user-profile">
-      <h1>Личный кабинет</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Личный кабинет</h1>
+        
+        {/* КНОПКА ВЫХОДА */}
+        <button 
+            onClick={onClickLogout} 
+            className="button" 
+            style={{ backgroundColor: '#ff4d4f', color: '#fff', padding: '10px 20px', border: 'none' }}
+        >
+            Выйти
+        </button>
+      </div>
       
       {/* 1. ИНФОРМАЦИЯ О ПОЛЬЗОВАТЕЛЕ */}
       <div className="profile-section">
@@ -90,7 +111,7 @@ const UserProfile = () => {
         </div>
       </div>
 
-      {/* 2. ИСТОРИЯ ЗАКАЗОВ (НОВОЕ) */}
+      {/* 2. ИСТОРИЯ ЗАКАЗОВ */}
       <div className="profile-section">
           <h3>История заказов</h3>
           
