@@ -22,6 +22,7 @@ export const getFilters = async (req, res) => {
 // Получение товаров с фильтрацией
 export const getAll = async (req, res) => {
   try {
+    // Достаем sortBy из query
     const { search, limit, page, sortBy, ...queryParams } = req.query;
 
     const pageNumber = parseInt(page) || 1;
@@ -45,27 +46,44 @@ export const getAll = async (req, res) => {
     // 3. Фильтрация
     Object.keys(queryParams).forEach((key) => {
       const value = queryParams[key];
-      // Если параметр есть в нашей карте фильтров и он не пустой
       if (fieldMap[key] && value) {
-        const valuesArray = value.split(','); // "Apple,Samsung" -> ["Apple", "Samsung"]
+        const valuesArray = value.split(',');
         if (valuesArray.length > 0) {
           dbQuery[fieldMap[key]] = { $in: valuesArray };
         }
       }
     });
 
-    // 4. Сортировка
-    let sortOptions = { createdAt: -1 };
-    if (sortBy === 'price_asc') sortOptions = { price: 1 };
-    else if (sortBy === 'price_desc') sortOptions = { price: -1 };
-    else if (sortBy === 'rating') sortOptions = { rating: -1 };
+    // 4. СОРТИРОВКА (Обновленная часть)
+    let sortOptions = { createdAt: -1 }; // По умолчанию: сначала новые
+
+    switch (sortBy) {
+      case 'price_asc':
+        sortOptions = { price: 1 }; // Цена: по возрастанию
+        break;
+      case 'price_desc':
+        sortOptions = { price: -1 }; // Цена: по убыванию
+        break;
+      case 'rating':
+        sortOptions = { rating: -1 }; // Рейтинг: сначала высокие
+        break;
+      case 'reviews':
+        sortOptions = { numReviews: -1 }; // Отзывы: сначала популярные
+        break;
+      case 'title':
+        sortOptions = { productName: 1 }; // Название: А-Я
+        break;
+      default:
+        sortOptions = { createdAt: -1 }; // Если ничего не выбрано
+    }
 
     // 5. Выполнение запроса
     const totalDocs = await ProductModel.countDocuments(dbQuery);
     const products = await ProductModel.find(dbQuery)
       .sort(sortOptions)
       .skip(skip)
-      .limit(limitNumber);
+      .limit(limitNumber)
+      .populate('user'); // Если нужно получить данные создателя товара
 
     res.json({
       items: products,
