@@ -95,7 +95,7 @@ const UserProfile = () => {
             Выйти
         </button>
       </div>
-      {user?.role === 'admin' && (
+      {data?.role === 'admin' && (
   <Link to="/admin" className="header__nav-item" style={{ fontWeight: 'bold', color: 'red' }}>
     Админка
   </Link>

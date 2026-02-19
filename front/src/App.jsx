@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import UserProfile from "./pages/UserProfile";
 import Home from './pages/Home';
+import AdminPanel from "./pages/AdminPanel.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<ProductPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/profile" element={<UserProfile />} />
 <Route path="/register" element={<Registration />} />
         </Routes>
