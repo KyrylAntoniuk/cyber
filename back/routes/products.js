@@ -15,5 +15,6 @@ router.patch('/:id', checkAuth, ProductController.update);
 
 router.post('/', checkAuth, checkAdmin, create);
 router.delete('/:id', checkAuth, checkAdmin, remove);
+router.patch('/:id', checkAuth, checkAdmin, update);
 
 export default router;

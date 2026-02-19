@@ -143,19 +143,24 @@ export const remove = async (req, res) => {
     }
 };
 
-// Обновить товар
+// Обновление товара
 export const update = async (req, res) => {
-    try { 
-        // new: true вернет уже обновленный объект, а не старый
-        const updatedProduct = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true }); 
-        
-        if (!updatedProduct) {
-            return res.status(404).json({ message: 'Товар не найден' });
-        }
+  try {
+    const productId = req.params.id;
 
-        res.json(updatedProduct); 
-    } catch(err) { 
-        console.log(err);
-        res.status(500).json({ message: 'Не удалось обновить товар' }); 
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      productId,
+      { ...req.body }, // Берем все данные из запроса
+      { new: true }    // Возвращаем обновленный документ
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Товар не найден' });
     }
+
+    res.json(updatedProduct);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Не удалось обновить товар' });
+  }
 };

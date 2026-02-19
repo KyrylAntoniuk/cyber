@@ -1,13 +1,19 @@
 import express from 'express';
-// Убедитесь, что функции импортируются правильно
-import * as OrderController from '../controllers/OrderController.js';
+// Заменили getUserOrders на getMyOrders
+import { createOrder, getMyOrders, getAllOrders, updateOrderStatus } from '../controllers/OrderController.js';
 import checkAuth from '../utils/checkAuth.js';
+import checkAdmin from '../utils/checkAdmin.js'; 
 
 const router = express.Router();
 
-router.post('/', checkAuth, OrderController.createOrder);
+// --- Админские роуты (Важно: они должны быть ДО роутов с параметрами типа /:id) ---
+router.get('/all', checkAuth, checkAdmin, getAllOrders);
+router.patch('/:id/status', checkAuth, checkAdmin, updateOrderStatus);
 
-// ИСПРАВЛЕНИЕ: getAllOrders -> getMyOrders
-router.get('/', checkAuth, OrderController.getMyOrders); 
+// --- Пользовательские роуты ---
+router.post('/', checkAuth, createOrder);
+
+// Используем getMyOrders вместо getUserOrders
+router.get('/', checkAuth, getMyOrders); 
 
 export default router;

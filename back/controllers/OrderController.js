@@ -63,3 +63,40 @@ export const getOneOrder = async (req, res) => {
     });
   }
 };
+
+// Получение всех заказов (для админ-панели)
+export const getAllOrders = async (req, res) => {
+  try {
+    // Подтягиваем данные пользователя и товаров
+    const orders = await OrderModel.find()
+      .populate('user', 'fullName email')
+      .populate('items.product');
+    res.json(orders);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Не удалось получить список заказов' });
+  }
+};
+
+// Изменение статуса заказа
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const updatedOrder = await OrderModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true } // Опция возвращает обновленный документ
+    ).populate('user', 'fullName email');
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Заказ не найден' });
+    }
+
+    res.json(updatedOrder);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Не удалось обновить статус заказа' });
+  }
+};
