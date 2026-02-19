@@ -13,6 +13,7 @@ import WishlistPage from "./pages/WishlistPage.jsx";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import UserProfile from "./pages/UserProfile";
+import Home from './pages/Home';
 
 function App() {
   const dispatch = useDispatch();
@@ -32,8 +33,8 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/cart/checkout" element={<Checkout />} />
           <Route path="/wishlist" element={<WishlistPage />} />
-          {/* Можно добавить маршрут по умолчанию, например на товары */}
-          <Route path="*" element={<ProductPage />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/catalog" element={<ProductPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<UserProfile />} />
 <Route path="/register" element={<Registration />} />
