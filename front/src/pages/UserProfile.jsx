@@ -95,6 +95,11 @@ const UserProfile = () => {
             Выйти
         </button>
       </div>
+      {user?.role === 'admin' && (
+  <Link to="/admin" className="header__nav-item" style={{ fontWeight: 'bold', color: 'red' }}>
+    Админка
+  </Link>
+)}
       
       {/* 1. ИНФОРМАЦИЯ О ПОЛЬЗОВАТЕЛЕ */}
       <div className="profile-section">

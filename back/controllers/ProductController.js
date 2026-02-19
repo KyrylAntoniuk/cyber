@@ -19,10 +19,9 @@ export const getFilters = async (req, res) => {
   }
 };
 
-// Получение товаров с фильтрацией
+// Получение товаров с фильтрацией (Для каталога)
 export const getAll = async (req, res) => {
   try {
-    // Достаем sortBy из query
     const { search, limit, page, sortBy, ...queryParams } = req.query;
 
     const pageNumber = parseInt(page) || 1;
@@ -54,27 +53,27 @@ export const getAll = async (req, res) => {
       }
     });
 
-    // 4. СОРТИРОВКА (Обновленная часть)
-    let sortOptions = { createdAt: -1 }; // По умолчанию: сначала новые
+    // 4. Сортировка
+    let sortOptions = { createdAt: -1 }; 
 
     switch (sortBy) {
       case 'price_asc':
-        sortOptions = { price: 1 }; // Цена: по возрастанию
+        sortOptions = { price: 1 };
         break;
       case 'price_desc':
-        sortOptions = { price: -1 }; // Цена: по убыванию
+        sortOptions = { price: -1 };
         break;
       case 'rating':
-        sortOptions = { rating: -1 }; // Рейтинг: сначала высокие
+        sortOptions = { rating: -1 };
         break;
       case 'reviews':
-        sortOptions = { numReviews: -1 }; // Отзывы: сначала популярные
+        sortOptions = { numReviews: -1 };
         break;
       case 'title':
-        sortOptions = { productName: 1 }; // Название: А-Я
+        sortOptions = { productName: 1 };
         break;
       default:
-        sortOptions = { createdAt: -1 }; // Если ничего не выбрано
+        sortOptions = { createdAt: -1 }; 
     }
 
     // 5. Выполнение запроса
@@ -82,8 +81,7 @@ export const getAll = async (req, res) => {
     const products = await ProductModel.find(dbQuery)
       .sort(sortOptions)
       .skip(skip)
-      .limit(limitNumber)
-      // .populate('user'); // Если нужно получить данные создателя товара
+      .limit(limitNumber);
 
     res.json({
       items: products,
@@ -98,28 +96,66 @@ export const getAll = async (req, res) => {
   }
 };
 
+// Получить один товар (Для детальной страницы)
 export const getOne = async (req, res) => {
   try {
     const product = await ProductModel.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: 'Товар не найден' });
+    if (!product) {
+        return res.status(404).json({ message: 'Товар не найден' });
+    }
     res.json(product);
-  } catch (err) { res.status(500).json({ message: 'Ошибка' }); }
+  } catch (err) { 
+    console.log(err);
+    res.status(500).json({ message: 'Ошибка при получении товара' }); 
+  }
 };
 
+// --- ФУНКЦИИ ДЛЯ АДМИНА ---
+
+// Создать новый товар
 export const create = async (req, res) => {
     try {
         const doc = new ProductModel(req.body);
         const product = await doc.save();
-        res.json(product);
-    } catch (err) { res.status(500).json({ message: 'Error' }); }
+        
+        // 201 статус означает "Создано"
+        res.status(201).json(product);
+    } catch (err) { 
+        console.log(err);
+        res.status(500).json({ message: 'Не удалось создать товар' }); 
+    }
 };
 
+// Удалить товар
 export const remove = async (req, res) => {
-    try { await ProductModel.findOneAndDelete({_id: req.params.id}); res.json({success: true}); } 
-    catch(err) { res.status(500).json({message: 'Error'}); }
+    try { 
+        const deletedProduct = await ProductModel.findByIdAndDelete(req.params.id);
+        
+        // Если товара с таким ID не было в БД
+        if (!deletedProduct) {
+            return res.status(404).json({ message: 'Товар не найден' });
+        }
+
+        res.json({ success: true, message: 'Товар успешно удален' }); 
+    } catch(err) { 
+        console.log(err);
+        res.status(500).json({ message: 'Не удалось удалить товар' }); 
+    }
 };
 
+// Обновить товар
 export const update = async (req, res) => {
-    try { await ProductModel.updateOne({_id: req.params.id}, req.body); res.json({success: true}); } 
-    catch(err) { res.status(500).json({message: 'Error'}); }
+    try { 
+        // new: true вернет уже обновленный объект, а не старый
+        const updatedProduct = await ProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true }); 
+        
+        if (!updatedProduct) {
+            return res.status(404).json({ message: 'Товар не найден' });
+        }
+
+        res.json(updatedProduct); 
+    } catch(err) { 
+        console.log(err);
+        res.status(500).json({ message: 'Не удалось обновить товар' }); 
+    }
 };
