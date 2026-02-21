@@ -5,6 +5,45 @@ import { fetchProducts } from '../redux/slices/productSlice';
 import { fetchAllOrders, updateOrderStatus } from '../redux/slices/orderSlice';
 import axios from '../axios';
 
+// ================= КОНФИГУРАЦИЯ КАТЕГОРИЙ =================
+const PRODUCT_TYPES = {
+  phones: {
+    label: 'Телефоны',
+    characteristics: ['Memory', 'Screen size', 'CPU', 'Number of Cores', 'Main camera', 'Front-camera', 'Battery capacity'],
+    details: [
+      { group: 'screen', key: 'screenDiagonal' },
+      { group: 'screen', key: 'theScreenResolution' },
+      { group: 'CPU', key: 'CPU' }
+    ]
+  },
+  laptops: {
+    label: 'Ноутбуки',
+    characteristics: ['Processor', 'RAM', 'Storage', 'Display', 'Graphics', 'Battery'],
+    details: [
+      { group: 'display', key: 'size' },
+      { group: 'display', key: 'resolution' },
+      { group: 'performance', key: 'CPU' },
+      { group: 'performance', key: 'GPU' }
+    ]
+  },
+  cameras: {
+    label: 'Камеры',
+    characteristics: ['Megapixels', 'Sensor Type', 'Video Resolution', 'ISO Range', 'Battery'],
+    details: [
+      { group: 'sensor', key: 'type' },
+      { group: 'sensor', key: 'size' },
+      { group: 'video', key: 'maxResolution' }
+    ]
+  },
+  other: {
+    label: 'Другое',
+    characteristics: ['Weight', 'Dimensions', 'Color'],
+    details: [
+      { group: 'general', key: 'material' }
+    ]
+  }
+};
+
 const AdminPanel = () => {
   const dispatch = useDispatch();
   
@@ -16,29 +55,18 @@ const AdminPanel = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
 
-  // --- БАЗОВЫЕ ЗНАЧЕНИЯ ФОРМЫ ---
-  const initialFormState = {
-    productName: '', price: '', img: '', brand: '', description: '', // screenType удален
-    colors: [], 
-    // Память перенесена в characteristics
-    characteristics: [
-      { key: 'Memory', value: '' }, // Добавили память сюда
-      { key: 'Screen size', value: '' },
-      { key: 'CPU', value: '' },
-      { key: 'Number of Cores', value: '' },
-      { key: 'Main camera', value: '' },
-      { key: 'Front-camera', value: '' },
-      { key: 'Battery capacity', value: '' }
-    ],
-    // Детали теперь полностью кастомные (Группа -> Ключ -> Значение)
-    details: [
-      { group: 'screen', key: 'screenDiagonal', value: '' },
-      { group: 'screen', key: 'theScreenResolution', value: '' },
-      { group: 'CPU', key: 'CPU', value: '' }
-    ]
+  // Функция для генерации дефолтного стейта на основе категории
+  const getInitialStateByCategory = (categoryKey = 'phones') => {
+    const config = PRODUCT_TYPES[categoryKey];
+    return {
+      productName: '', price: '', img: '', brand: '', description: '', category: categoryKey,
+      colors: [],
+      characteristics: config.characteristics.map(key => ({ key, value: '' })),
+      details: config.details.map(d => ({ group: d.group, key: d.key, value: '' }))
+    };
   };
 
-  const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState(getInitialStateByCategory('phones'));
 
   useEffect(() => {
     if (activeTab === 'products') dispatch(fetchProducts({ limit: 100 })); 
@@ -54,6 +82,25 @@ const AdminPanel = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // --- НОВОЕ: Обработчик смены категории ---
+  const handleCategoryChange = (e) => {
+    const newCategory = e.target.value;
+    
+    setFormData((prev) => {
+      const newState = { ...prev, category: newCategory };
+      
+      // Если мы создаем новый товар (а не редактируем старый), 
+      // то при смене категории подставляем её шаблонные характеристики
+      if (!editingProductId) {
+        const config = PRODUCT_TYPES[newCategory] || PRODUCT_TYPES.other;
+        newState.characteristics = config.characteristics.map(key => ({ key, value: '' }));
+        newState.details = config.details.map(d => ({ group: d.group, key: d.key, value: '' }));
+      }
+      
+      return newState;
+    });
   };
 
   // Цвета
@@ -86,12 +133,12 @@ const AdminPanel = () => {
   // ================= ОТПРАВКА И ЗАПОЛНЕНИЕ =================
 
   const handleEditClick = (product) => {
-    // Распаковываем характеристики
+    // Определяем категорию, если её нет - ставим 'other'
+    const prodCategory = product.category || 'other';
+
     const charsObj = product.characteristics || {};
     let charsArr = Object.entries(charsObj).map(([key, value]) => ({ key, value }));
-    if (charsArr.length === 0) charsArr = initialFormState.characteristics;
 
-    // Распаковываем сложный объект деталей в плоский массив для формы
     let detailsArr = [];
     if (product.details && product.details[0]) {
       Object.entries(product.details[0]).forEach(([groupName, groupArr]) => {
@@ -102,7 +149,6 @@ const AdminPanel = () => {
         }
       });
     }
-    if (detailsArr.length === 0) detailsArr = initialFormState.details;
 
     setFormData({
       productName: product.productName || product.title || '',
@@ -110,6 +156,7 @@ const AdminPanel = () => {
       img: product.img || product.imageUrl || '',
       brand: product.brand || '',
       description: product.description || '',
+      category: prodCategory, // <-- Загружаем категорию
       colors: product.options?.color || [],
       characteristics: charsArr,
       details: detailsArr
@@ -122,13 +169,11 @@ const AdminPanel = () => {
   const handleProductSubmit = async (e) => {
     e.preventDefault();
 
-    // Упаковываем характеристики (пропуская пустые)
     const packedCharacteristics = formData.characteristics.reduce((acc, char) => {
       if (char.key.trim() && char.value.trim()) acc[char.key.trim()] = char.value.trim();
       return acc;
     }, {});
 
-    // Упаковываем кастомные детали в сложную вложенность
     const detailsObj = {};
     formData.details.forEach(detail => {
       const g = detail.group.trim();
@@ -141,17 +186,15 @@ const AdminPanel = () => {
     });
     const packedDetails = Object.keys(detailsObj).length > 0 ? [detailsObj] : [];
 
-    // Итоговый JSON
     const payload = {
       productName: formData.productName,
       price: Number(formData.price),
       img: formData.img,
       brand: formData.brand,
       description: formData.description,
+      category: formData.category, // <-- Отправляем категорию на бэкенд
       characteristics: packedCharacteristics,
-      options: {
-        color: formData.colors.map(c => c.trim()).filter(Boolean)
-      },
+      options: { color: formData.colors.map(c => c.trim()).filter(Boolean) },
       details: packedDetails
     };
 
@@ -190,7 +233,7 @@ const AdminPanel = () => {
   };
 
   const resetForm = () => {
-    setFormData(initialFormState);
+    setFormData(getInitialStateByCategory('phones'));
     setEditingProductId(null);
     setIsFormOpen(false);
   };
@@ -233,6 +276,20 @@ const AdminPanel = () => {
                     <div style={sectionStyle}>
                       <h4 style={{ marginTop: 0 }}>Основная информация</h4>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        
+                        {/* --- ВЫБОР КАТЕГОРИИ --- */}
+                        <label style={{ fontSize: '12px', color: 'gray', marginBottom: '-5px' }}>Категория товара:</label>
+                        <select 
+                          name="category" 
+                          value={formData.category} 
+                          onChange={handleCategoryChange} 
+                          style={{ ...inputStyle, cursor: 'pointer', background: '#fff' }}
+                        >
+                          {Object.entries(PRODUCT_TYPES).map(([key, config]) => (
+                            <option key={key} value={key}>{config.label}</option>
+                          ))}
+                        </select>
+
                         <input type="text" name="productName" placeholder="Название товара*" required value={formData.productName} onChange={handleChange} style={inputStyle} />
                         <input type="number" name="price" placeholder="Цена (₴)*" required value={formData.price} onChange={handleChange} style={inputStyle} />
                         <input type="text" name="img" placeholder="URL картинки*" required value={formData.img} onChange={handleChange} style={inputStyle} />
@@ -241,7 +298,6 @@ const AdminPanel = () => {
                       </div>
                     </div>
 
-                    {/* --- ОБНОВЛЕННЫЕ КАСТОМНЫЕ ДЕТАЛИ --- */}
                     <div style={sectionStyle}>
                       <h4 style={{ marginTop: 0 }}>Технические детали (Details)</h4>
                       {formData.details.map((detail, index) => (
@@ -249,7 +305,7 @@ const AdminPanel = () => {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1 }}>
                             <input type="text" placeholder="Группа (напр. screen)" value={detail.group} onChange={(e) => handleDetailChange(index, 'group', e.target.value)} style={inputStyle} />
                             <input type="text" placeholder="Свойство (напр. screenDiagonal)" value={detail.key} onChange={(e) => handleDetailChange(index, 'key', e.target.value)} style={inputStyle} />
-                            <input type="text" placeholder="Значение (напр. 6.7)" value={detail.value} onChange={(e) => handleDetailChange(index, 'value', e.target.value)} style={inputStyle} />
+                            <input type="text" placeholder="Значение" value={detail.value} onChange={(e) => handleDetailChange(index, 'value', e.target.value)} style={inputStyle} />
                           </div>
                           <button type="button" onClick={() => removeDetailItem(index)} style={{ ...delBtnStyle, height: 'fit-content', alignSelf: 'center' }}>✕</button>
                         </div>
@@ -265,8 +321,8 @@ const AdminPanel = () => {
                       <h4 style={{ marginTop: 0 }}>Характеристики</h4>
                       {formData.characteristics.map((char, index) => (
                         <div key={index} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                          <input type="text" placeholder="Название (напр. Memory)" value={char.key} onChange={(e) => handleCharChange(index, 'key', e.target.value)} style={{...inputStyle, flex: 1}} />
-                          <input type="text" placeholder="Значение (напр. 256GB)" value={char.value} onChange={(e) => handleCharChange(index, 'value', e.target.value)} style={{...inputStyle, flex: 1}} />
+                          <input type="text" placeholder="Название ключа" value={char.key} onChange={(e) => handleCharChange(index, 'key', e.target.value)} style={{...inputStyle, flex: 1}} />
+                          <input type="text" placeholder="Значение" value={char.value} onChange={(e) => handleCharChange(index, 'value', e.target.value)} style={{...inputStyle, flex: 1}} />
                           <button type="button" onClick={() => removeCharItem(index)} style={delBtnStyle}>✕</button>
                         </div>
                       ))}
@@ -310,6 +366,7 @@ const AdminPanel = () => {
                 <tr style={{ borderBottom: '2px solid #000' }}>
                   <th style={{ padding: '10px' }}>Фото</th>
                   <th>Название</th>
+                  <th>Категория</th>
                   <th>Цена</th>
                   <th>Бренд</th>
                   <th>Действия</th>
@@ -319,8 +376,11 @@ const AdminPanel = () => {
                 {products.map((item) => (
                   <tr key={item._id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ padding: '10px' }}><img src={item.img || item.imageUrl} alt="img" width="50" height="50" style={{ objectFit: 'contain' }}/></td>
-                    <td>{item.productName || item.title}</td>
-                    <td>{item.price} ₴</td>
+                    <td style={{ maxWidth: '200px' }}>{item.productName || item.title}</td>
+                    <td style={{ color: 'gray', fontSize: '13px' }}>
+                       {PRODUCT_TYPES[item.category]?.label || item.category || 'Другое'}
+                    </td>
+                    <td style={{ fontWeight: 'bold' }}>{item.price} ₴</td>
                     <td>{item.brand}</td>
                     <td style={{ display: 'flex', gap: '10px', padding: '15px 0' }}>
                       <button onClick={() => handleEditClick(item)} style={{ background: '#1890ff', color: 'white', border: 'none', padding: '8px 12px', cursor: 'pointer', borderRadius: '5px' }}>Изменить</button>
