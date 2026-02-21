@@ -24,6 +24,7 @@ const AdminProducts = () => {
   // Состояния для поиска и сортировки
   const [searchValue, setSearchValue] = useState('');
   const [sortBy, setSortBy] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
 
   // Эффект с дебаунсом: отправляем запрос через 400мс после того как пользователь перестал вводить текст
   useEffect(() => {
@@ -122,6 +123,12 @@ const AdminProducts = () => {
     }
   };
 
+  // Фильтрация товаров на клиенте по выбранной категории
+  const filteredProducts = products.filter((item) => {
+    if (filterCategory && item.category !== filterCategory) return false;
+    return true;
+  });
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', alignItems: 'center' }}>
@@ -143,6 +150,19 @@ const AdminProducts = () => {
             onChange={(e) => setSearchValue(e.target.value)}
             style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc', flex: 1, outline: 'none' }}
           />
+          
+          {/* Фильтр по категории */}
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc', outline: 'none', cursor: 'pointer' }}
+          >
+            <option value="">Все категории</option>
+            {Object.entries(PRODUCT_TYPES).map(([key, val]) => (
+              <option key={key} value={key}>{val.label}</option>
+            ))}
+          </select>
+
           <select 
             value={sortBy} 
             onChange={(e) => setSortBy(e.target.value)}
@@ -205,6 +225,8 @@ const AdminProducts = () => {
         <p>Загрузка товаров...</p>
       ) : products.length === 0 ? (
         <p style={{ color: 'gray' }}>Товары не найдены.</p>
+      ) : filteredProducts.length === 0 ? (
+        <p style={{ color: 'gray' }}>В этой категории товаров нет.</p>
       ) : (
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
@@ -218,7 +240,7 @@ const AdminProducts = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((item) => (
+            {filteredProducts.map((item) => (
               <tr key={item._id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '10px' }}><img src={item.img || item.imageUrl} alt="img" width="50" height="50" style={{ objectFit: 'contain' }}/></td>
                 <td style={{ maxWidth: '200px' }}>{item.productName || item.title}</td>

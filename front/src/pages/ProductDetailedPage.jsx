@@ -92,6 +92,9 @@ function ProductDetailedPage() {
 
         {/* Правая часть: Инфо */}
         <div className="right-secion">
+          <span style={{ color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>
+            {product.category || 'Electronics'}
+          </span>
           <h1 className="product-name">{product.productName}</h1>
           
           <div className="product-meta" style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>

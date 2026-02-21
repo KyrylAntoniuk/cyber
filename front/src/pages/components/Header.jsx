@@ -29,6 +29,13 @@ function Header() {
             <img src={Logo} alt="Cyber Shop" />
           </Link>
 
+          {/* Меню категорий */}
+          <div className="header__categories" style={{ display: 'flex', gap: '20px', margin: '0 20px' }}>
+            <Link to="/products?category=phones" style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500 }}>Phones</Link>
+            <Link to="/products?category=laptops" style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500 }}>Laptops</Link>
+            <Link to="/products?category=cameras" style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500 }}>Cameras</Link>
+          </div>
+
           {/* 2. Поиск */}
           <div className="header__search">
             <Search />

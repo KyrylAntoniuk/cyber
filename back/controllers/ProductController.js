@@ -22,7 +22,7 @@ export const getFilters = async (req, res) => {
 // Получение товаров с фильтрацией (Для каталога)
 export const getAll = async (req, res) => {
   try {
-    const { search, limit, page, sortBy, ...queryParams } = req.query;
+    const { search, limit, page, sortBy, category, ...queryParams } = req.query;
 
     const pageNumber = parseInt(page) || 1;
     const limitNumber = parseInt(limit) || 8;
@@ -40,6 +40,11 @@ export const getAll = async (req, res) => {
     // 2. Поиск (Search)
     if (search) {
       dbQuery.productName = { $regex: search, $options: 'i' };
+    }
+
+    // 2.1 Фильтрация по Категории (Phones, Laptops, etc.)
+    if (category) {
+      dbQuery.category = category;
     }
 
     // 3. Фильтрация

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactPaginate from "react-paginate";
+import { useLocation } from "react-router-dom";
 
 import ProductCard from "./components/ProductCard";
 import Filters from "./components/Filters";
@@ -13,6 +14,7 @@ const LIMIT = 8;
 
 function ProductPage() {
   const dispatch = useDispatch();
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   
   // Добавляем состояние для сортировки (по умолчанию 'rating' или то, что нравится)
@@ -26,17 +28,22 @@ function ProductPage() {
   // Сброс страницы при изменении фильтров, поиска ИЛИ СОРТИРОВКИ
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedFilters, searchValue, sortBy]);
+  }, [selectedFilters, searchValue, sortBy, location.search]);
 
   // --- ГЛАВНЫЙ ЗАПРОС ---
   useEffect(() => {
     const getProducts = async () => {
+      // Получаем категорию из URL
+      const searchParams = new URLSearchParams(location.search);
+      const category = searchParams.get('category');
+
       // 1. Базовые параметры + СОРТИРОВКА
       const params = {
         page: currentPage,
         limit: LIMIT,
         search: searchValue,
         sortBy: sortBy, // <--- Передаем выбранную сортировку на бэкенд
+        category: category, // Добавляем категорию в запрос
       };
 
       // 2. Добавляем фильтры
@@ -54,7 +61,7 @@ function ProductPage() {
 
     getProducts();
     window.scrollTo(0, 0);
-  }, [currentPage, selectedFilters, searchValue, sortBy, dispatch]); // Добавили sortBy в зависимости
+  }, [currentPage, selectedFilters, searchValue, sortBy, dispatch, location.search]); // Добавили location.search в зависимости
 
   // Создаем Set для быстрой проверки избранного
   const wishlistSet = new Set(wishlistItems.map((i) => (i.product ? i.product._id : i.itemId)));
