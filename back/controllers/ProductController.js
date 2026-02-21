@@ -112,18 +112,28 @@ export const getOne = async (req, res) => {
 
 // --- ФУНКЦИИ ДЛЯ АДМИНА ---
 
-// Создать новый товар
-export const create = async (req, res) => {
-    try {
-        const doc = new ProductModel(req.body);
-        const product = await doc.save();
-        
-        // 201 статус означает "Создано"
-        res.status(201).json(product);
-    } catch (err) { 
-        console.log(err);
-        res.status(500).json({ message: 'Не удалось создать товар' }); 
+// Массовое создание товаров из загруженного JSON
+export const createBulk = async (req, res) => {
+  try {
+    const products = req.body; // Теперь мы ожидаем массив объектов
+
+    // Проверяем, что пришел именно массив и он не пустой
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ message: 'Ожидается непустой массив товаров в формате JSON' });
     }
+
+    // Метод insertMany за один запрос добавляет все документы в БД
+    const insertedProducts = await ProductModel.insertMany(products);
+    
+    // 201 статус означает "Создано"
+    res.status(201).json({
+      message: `Успешно добавлено ${insertedProducts.length} товаров`,
+      products: insertedProducts
+    });
+  } catch (err) { 
+    console.log(err);
+    res.status(500).json({ message: 'Не удалось массово создать товары', error: err.message }); 
+  }
 };
 
 // Удалить товар
