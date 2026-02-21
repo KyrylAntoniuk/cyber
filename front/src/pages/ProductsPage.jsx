@@ -9,6 +9,7 @@ import { fetchProducts } from "../redux/slices/productSlice";
 import { fetchWishlistItems } from "../redux/slices/wishlistSlice";
 
 import "../SCSS/pages/productsPage.scss";
+import "../SCSS/components/pagination.scss";
 
 const LIMIT = 8;
 
@@ -53,7 +54,7 @@ function ProductPage() {
         }
       });
 
-      console.log("🚀 ОТПРАВКА ЗАПРОСА С ПАРАМЕТРАМИ:", params);
+      // console.log("🚀 ОТПРАВКА ЗАПРОСА С ПАРАМЕТРАМИ:", params);
 
       dispatch(fetchProducts(params));
       dispatch(fetchWishlistItems());

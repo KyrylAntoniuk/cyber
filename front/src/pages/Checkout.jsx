@@ -7,8 +7,6 @@ import { clearCart } from "../redux/slices/cartSlice";
 
 // Компоненты
 import AdressSelector from "./components/AdressSelector";
-import ShipmentSelector from "./components/ShipmentSelector";
-// import PaymentSelection from "./components/PaymentSelection"; // Можно раскомментировать, если готово
 
 import "../SCSS/pages/CheckoutPage.scss";
 
@@ -23,6 +21,8 @@ const Checkout = () => {
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedSavedAddress, setSelectedSavedAddress] = React.useState(null);
+  const [shipmentMethod, setShipmentMethod] = React.useState("Nova Poshta");
+  const [paymentMethod, setPaymentMethod] = React.useState("Card");
 
   // Локальный стейт для формы
   const [formData, setFormData] = React.useState({
@@ -64,15 +64,20 @@ const Checkout = () => {
     try {
       setIsLoading(true);
 
+      // Валидация
+      if (!formData.address || !formData.phoneNumber || !formData.addressName) {
+        alert("Пожалуйста, заполните обязательные поля адреса (Name, Address, Phone)");
+        setIsLoading(false);
+        return;
+      }
+
       // 1. Формируем товары
       const orderItems = items.map((item) => ({
         product: item.id,
         quantity: item.count,
         price: item.price,
-        selectedOptions: {
-            color: item.color || "#000000",
-            builtInMemory: item.capacity || "128GB"
-        }
+        // Передаем реальные опции, которые выбрал пользователь
+        selectedOptions: item.options || {}
       }));
 
       // 2. Собираем заказ
@@ -86,6 +91,8 @@ const Checkout = () => {
           address: formData.address,
           tag: formData.tag,
         },
+        shipmentMethod,
+        paymentMethod
       };
 
       // 3. Отправляем
@@ -166,7 +173,45 @@ const Checkout = () => {
           {/* Доставка */}
           <section className="checkout-section">
              <h2>Shipment Method</h2>
-             <ShipmentSelector />
+             <div className="form-group">
+               <label style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #eee', borderRadius: '8px', cursor: 'pointer'}}>
+                 <input 
+                    type="radio" 
+                    name="shipment" 
+                    checked={shipmentMethod === "Nova Poshta"} 
+                    onChange={() => setShipmentMethod("Nova Poshta")}
+                 />
+                 <span>Nova Poshta (Delivery to branch)</span>
+               </label>
+               <label style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #eee', borderRadius: '8px', cursor: 'pointer'}}>
+                 <input 
+                    type="radio" 
+                    name="shipment" 
+                    checked={shipmentMethod === "Courier"} 
+                    onChange={() => setShipmentMethod("Courier")}
+                 />
+                 <span>Courier (Address delivery)</span>
+               </label>
+             </div>
+          </section>
+
+          {/* Оплата */}
+          <section className="checkout-section">
+             <h2>Payment Method</h2>
+             <div className="form-group">
+                <label style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #eee', borderRadius: '8px', cursor: 'pointer'}}>
+                   <input type="radio" name="payment" checked={paymentMethod === "Card"} onChange={() => setPaymentMethod("Card")} />
+                   <span>Credit Card</span>
+                </label>
+                <label style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #eee', borderRadius: '8px', cursor: 'pointer'}}>
+                   <input type="radio" name="payment" checked={paymentMethod === "PayPal"} onChange={() => setPaymentMethod("PayPal")} />
+                   <span>PayPal</span>
+                </label>
+                <label style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #eee', borderRadius: '8px', cursor: 'pointer'}}>
+                   <input type="radio" name="payment" checked={paymentMethod === "Cash"} onChange={() => setPaymentMethod("Cash")} />
+                   <span>Cash on Delivery</span>
+                </label>
+             </div>
           </section>
         </div>
 
@@ -183,7 +228,11 @@ const Checkout = () => {
                   </div>
                   <div className="summary-item__info">
                     <p>{item.title}</p>
-                    <span>x {item.count}</span>
+                    {/* Отображаем опции (цвет, память и т.д.) */}
+                    <div style={{ fontSize: '12px', color: '#888', marginBottom: '5px' }}>
+                      {item.options && Object.values(item.options).join(' / ')}
+                    </div>
+                    <span style={{ fontSize: '13px' }}>x {item.count}</span>
                   </div>
                   <div className="summary-item__price">
                     {item.price * item.count} ₴

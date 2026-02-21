@@ -19,7 +19,7 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
   // Безопасно получаем список адресов
   const list = data?.addressList || [];
 
-  const [updateAderss, setUpdateAdress] = React.useState({
+  const [addressForm, setAddressForm] = React.useState({
     addressName: "", // Исправил опечатку: adressName -> addressName (чтобы совпадало с БД)
     tag: "home",
     address: "",     // Само поле адреса
@@ -29,7 +29,7 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdateAdress((prevData) => ({
+    setAddressForm((prevData) => ({
       ...prevData,
       [name]: value,
     }));
@@ -37,16 +37,20 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
 
   const handleUpdate = async () => {
       // 1. Проверка на пустоту
-      if (!updateAderss.addressName || !updateAderss.address) {
-          alert("Пожалуйста, заполните название и адрес!");
+      if (!addressForm.addressName || !addressForm.address || !addressForm.phoneNumber) {
+          alert("Пожалуйста, заполните название, адрес и телефон!");
           return;
       }
 
       try {
-          console.log("Добавление адреса...");
+          // console.log("Добавление адреса..."); // Убираем лишний лог
           
+          // Подготовка данных: убираем пустые поля, чтобы избежать ошибок валидации/кастинга на бэкенде
+          const newAddress = { ...addressForm };
+          if (!newAddress.postCode) delete newAddress.postCode;
+
           // 2. Создаем новый массив адресов (старые + новый)
-          const newAddressList = [...list, updateAderss];
+          const newAddressList = [...list, newAddress];
 
           // 3. Отправляем ВЕСЬ обновленный массив на сервер через fetchUpdateUser
           const result = await dispatch(fetchUpdateUser({ addressList: newAddressList }));
@@ -54,7 +58,7 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
           if (result.meta.requestStatus === 'fulfilled') {
              alert("Адрес успешно добавлен!");
              setAddAdressButton(false);
-             setUpdateAdress({
+             setAddressForm({
                 addressName: "",
                 tag: "home",
                 address: "",
@@ -118,14 +122,14 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
                 className="change-section-input"
                 type="text"
                 name="addressName" // Исправлено имя поля
-                value={updateAderss.addressName}
+                value={addressForm.addressName}
                 onChange={handleInputChange}
                 placeholder="Name (e.g. Home)"
               />
               <select
                 className="tag-selector"
                 name="tag"
-                value={updateAderss.tag}
+                value={addressForm.tag}
                 onChange={handleInputChange}
               >
                 <option value="home">home</option>
@@ -138,7 +142,7 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
                 className="change-section-input"
                 type="text"
                 name="address"
-                value={updateAderss.address}
+                value={addressForm.address}
                 onChange={handleInputChange}
                 placeholder="Full Address"
               />
@@ -146,7 +150,7 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
                 className="change-section-input"
                 type="text"
                 name="postCode"
-                value={updateAderss.postCode}
+                value={addressForm.postCode}
                 onChange={handleInputChange}
                 placeholder="Post Code"
               />
@@ -155,7 +159,7 @@ export default function AdressSelector({ onSelect, selectedAddress }) {
               className="change-section-input"
               type="text"
               name="phoneNumber"
-              value={updateAderss.phoneNumber}
+              value={addressForm.phoneNumber}
               onChange={handleInputChange}
               placeholder="Phone Number"
             />

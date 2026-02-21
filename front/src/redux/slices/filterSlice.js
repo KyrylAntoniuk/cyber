@@ -7,7 +7,7 @@ export const fetchFilters = createAsyncThunk("filter/fetchFilters", async () => 
 });
 
 const initialState = {
-  availableFilters: {},
+  availableFilters: [],
   selectedFilters: {},
   searchValue: "",
   status: "loading",

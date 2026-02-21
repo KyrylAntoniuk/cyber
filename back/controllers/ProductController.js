@@ -4,13 +4,37 @@ import FilterModel from '../models/Filter.js';
 // Получение списка фильтров для Фронтенда
 export const getFilters = async (req, res) => {
   try {
-    const filters = await FilterModel.find();
+    const { category } = req.query;
     
-    // Преобразуем в объект: { brand: [...], builtInMemory: [...] }
-    const response = {};
-    filters.forEach(f => {
-      response[f.queryKey] = f.options; 
-    });
+    // Формируем запрос: если категория выбрана, ищем фильтры, привязанные к ней.
+    // Если нет - возвращаем все (или можно возвращать только общие).
+    const query = category 
+      ? { categories: category } 
+      : {};
+
+    // Получаем список разрешенных фильтров для этой категории
+    const filters = await FilterModel.find(query);
+    
+    const response = [];
+
+    // Проходим по всем фильтрам и ищем реальные значения в товарах
+    for (const f of filters) {
+      const dbKey = f.dbKey || f.queryKey;
+      // Ищем уникальные значения только среди товаров этой категории
+      const distinctQuery = category ? { category } : {};
+
+      // Получаем уникальные значения (distinct) только для товаров выбранной категории
+      const distinctValues = await ProductModel.distinct(dbKey, distinctQuery);
+
+      // Если значения есть, добавляем их в ответ (сортируем для красоты)
+      if (distinctValues.length > 0) {
+        response.push({
+          name: f.name, // Например: "Screen Type"
+          key: f.queryKey, // Например: "screenType"
+          options: distinctValues.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }))
+        });
+      }
+    }
 
     res.json(response);
   } catch (err) {

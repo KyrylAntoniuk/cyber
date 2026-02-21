@@ -38,14 +38,15 @@ function Filters() {
       </button>
 
       <div className={`filters-list ${visible ? "visible" : ""}`}>
-        {Object.entries(availableFilters).map(([filterKey, options]) => {
+        {availableFilters.map((filter) => {
+          const { name, key: filterKey, options } = filter;
           if (!options || options.length === 0) return null;
           const isOpen = openFilters[filterKey] ?? false;
 
           return (
             <div key={filterKey} className="filter-group">
               <div className="filter-header" onClick={() => toggleFilter(filterKey)}>
-                <span>{formatLabel(filterKey)}</span>
+                <span>{name}</span>
                 <img src={isOpen ? expendLessSvg : expondMoreSvg} alt="" />
               </div>
 

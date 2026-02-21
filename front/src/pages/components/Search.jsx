@@ -25,18 +25,14 @@ export default function Search() {
         return;
       }
       
-      // Запрашиваем ВСЕ товары, чтобы отфильтровать на клиенте 
-      // (так надежнее, пока на бэкенде не исправлен поиск по productName)
-      const { data } = await axios.get(`/products`); 
+      // РЕФАКТОРИНГ: Запрашиваем поиск на сервере, а не скачиваем всю базу
+      // Добавляем limit=5, чтобы не грузить лишнее для превью
+      const { data } = await axios.get(`/products`, {
+        params: { search: value, limit: 5 }
+      }); 
       
-      // ИСПРАВЛЕНИЕ: Проверяем, где лежат товары (в data или data.items)
-      const productsArray = Array.isArray(data) ? data : (data.items || []);
-
-      const filtered = productsArray.filter(obj => 
-        obj.productName.toLowerCase().includes(value.toLowerCase())
-      );
-      
-      setFetchedProducts(filtered);
+      // Бэкенд возвращает объект { items: [...], ... }
+      setFetchedProducts(data.items || []);
       setIsOpen(true);
     } catch (error) {
       console.warn("Ошибка при поиске:", error);

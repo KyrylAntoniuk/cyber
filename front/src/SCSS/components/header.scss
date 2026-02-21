@@ -1,85 +1,92 @@
-@import "../abstracts/mixins.scss";
-@import "../abstracts//variables";
-
-header {
-  position: fixed;
-  left: 0;
-  top: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 3;
-  border-bottom: 1px solid #525252;
+.header {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 0;
   background-color: #fff;
-  width: 80%;
-  padding: 8px 10%;
-  @include respond-to($tablet) {
-    justify-content: space-around;
-  }
-  @include respond-to($mobile) {
-    justify-content: space-around;
-    padding: 8px 2%;
-    width: 100%;
-  }
-  .burger {
-    display: none;
-    background-color: transparent;
-    border: none;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
-    @include respond-to($laptop) {
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__logo {
+    img {
+      height: 24px; // Подгони под размер своего лого
       display: block;
     }
   }
 
-  .nav-main {
-    ul {
-      display: flex;
-      justify-content: space-between;
-      li {
-        margin: 0 1.5rem;
-        list-style: none;
+  &__categories {
+    display: flex;
+    gap: 30px;
+    
+    a {
+      font-size: 16px;
+      font-weight: 500;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: color 0.2s ease;
+      position: relative;
 
-        &:hover {
-          color: #989898;
-        }
+      &:hover {
+        color: #555;
       }
-    }
-    @include respond-to($laptop) {
-      display: none;
+
+      // Подчеркивание при наведении
+      &::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -4px;
+        left: 0;
+        background-color: #000;
+        transition: width 0.3s;
+      }
+
+      &:hover::after {
+        width: 100%;
+      }
     }
   }
 
-  .nav-icons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  &__search {
+    flex: 1;
+    margin: 0 40px;
+    max-width: 400px;
+  }
 
-    .cart-button-container {
-      position: relative;
-      p {
-        position: absolute;
-        text-align: center;
-        line-height: 18px;
-        background-color: #ff0000;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        top: 5px;
-        right: 15px;
-        z-index: 100;
-        font-size: 12px;
-        color: #fff;
-      }
-      .cart-button {
-        display: block !important;
-      }
-      img {
-        cursor: pointer;
-        margin: 0 1rem;
-        @include respond-to($laptop) {
-          display: none;
-        }
-      }
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+
+  @media (max-width: 768px) {
+    &__wrapper {
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    &__logo { order: 1; }
+    &__nav { order: 2; }
+    
+    &__search {
+      order: 3;
+      margin: 0;
+      min-width: 100%;
+      max-width: none;
+    }
+
+    &__categories {
+      order: 4;
+      width: 100%;
+      justify-content: center;
+      margin: 10px 0 0;
     }
   }
 }

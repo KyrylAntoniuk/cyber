@@ -7,6 +7,7 @@ const FilterSchema = new mongoose.Schema(
     dbKey: { type: String, required: true },     // Путь в БД (напр. "options.builtInMemory")
     type: { type: String, default: "checkbox" }, // Тип фильтра
     options: [{ type: String }],                 // Список доступных значений
+    categories: [String]
   },
   { timestamps: true }
 );

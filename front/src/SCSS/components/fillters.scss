@@ -1,73 +1,68 @@
-@import "../abstracts/mixins.scss";
-@import "../abstracts/variables";
-
 .filters-container {
-  margin-right: 2rem;
-  @include respond-to($tablet) {
-    margin-right: 0;
-  }
-
-  h1 {
-    @include respond-to($tablet) {
-      display: none;
-    }
-  }
-  .burger {
-    display: none;
-    background-color: transparent;
-    outline: 0.5px solid #d4d4d4;
-    outline-offset: -0.5px;
-    border: none;
-    border-radius: 10px;
-    width: 45%;
-    padding: 12px 16px;
-
-    @include respond-to($tablet) {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-  }
-  .filter-items-visible {
-    @extend .filter-items;
-    display: block !important;
-    background-color: #fff;
-    position: inherit;
-  }
-  .filter-items {
-    @include respond-to($tablet) {
-      display: none;
+  background: #fff;
+  
+  .filters-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
     }
 
-    div {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 12px 0;
-      border-bottom: 1px solid #b5b5b5;
-
-      span {
-        font-size: 18px;
-        font-weight: 600;
-        padding-right: 20px;
+    .reset-btn {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+      
+      &:hover {
+        color: #000;
       }
-      button {
-        border: none;
-        background-color: transparent;
-        cursor: pointer;
+    }
+  }
+
+  .burger {
+    display: none; // Скрываем на десктопе
+  }
+
+  .filter-group {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 16px;
+      
+      img {
+        opacity: 0.6;
       }
     }
 
     .filter-options {
+      margin-top: 15px;
       display: flex;
       flex-direction: column;
+      gap: 10px;
 
-      label {
-        font-weight: 500;
-        margin: 4px 0;
-
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #444;
+        
         input {
-          accent-color: black;
+          accent-color: #000;
           width: 16px;
           height: 16px;
         }

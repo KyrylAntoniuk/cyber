@@ -1,31 +1,46 @@
 .pagination {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-top: 30px;
+  list-style: none;
+  padding: 0;
 
-  &__btn, &__num {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    background: #fff;
+  li {
+    display: inline-block;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    color: #000;
+    text-decoration: none;
     cursor: pointer;
-    border-radius: 5px;
-    transition: 0.2s;
+    transition: all 0.2s;
+    font-weight: 500;
 
     &:hover {
-      background: #f0f0f0;
-    }
-    
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    &.active {
-      background: #000; // Ваш основной цвет
-      color: #fff;
       border-color: #000;
+      background-color: #fafafa;
+    }
+  }
+
+  .active a {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+  }
+
+  .disabled a {
+    opacity: 0.4;
+    cursor: not-allowed;
+    &:hover {
+      background: none;
+      border-color: #eee;
     }
   }
 }

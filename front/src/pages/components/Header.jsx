@@ -17,8 +17,6 @@ import Search from './Search';
 function Header() {
   const isAuth = useSelector(selectIsAuth);
   
-  // const { cartItems } = useSelector(state => state.cart);
-
   return (
     <header className="header">
       <div className="container">

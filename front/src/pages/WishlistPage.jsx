@@ -44,7 +44,7 @@ export default function WishlistPage() {
                 key={item.product._id}
                 {...item.product} // Передаем все свойства товара (img, productName, price)
                 isInWishlist={true} // Мы и так в вишлисте
-              /> <p>sex</p></>
+              /> </>
             );
           })}
         </div>

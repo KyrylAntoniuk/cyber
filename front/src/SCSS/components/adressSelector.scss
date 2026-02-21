@@ -1,92 +1,89 @@
-@use "../abstracts/mixins" as mix;
-@use "../abstracts/variables" as var;
-
-.add-adress-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  .dashed-line {
-    position: relative;
-
-    top: -16px;
-    height: 1px;
-    background: linear-gradient(to right, #000 50%, transparent 50%);
-    background-size: 8px 1px;
-    width: 100%;
+.address-selector-wrapper {
+  h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
   }
-  button {
-    position: relative;
 
-    background-color: transparent;
-    border: none;
+  .list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
   }
-}
-.adress-change-item {
-  display: flex;
-  justify-content: space-between;
-  margin: 24px 0;
-  border-radius: 10px;
-  background-color: #f6f6f6;
-  padding: 24px 12px 24px 64px;
-  .items-change {
-    .adress-name-change-wrapper {
-      input {
-        border: none;
-        border-bottom: 0.5px solid #9f9f9f;
-        background-color: #f6f6f6;
-        font-size: 18px;
-        margin-right: 12px;
-        width: 50%;
-        &:focus {
-          outline: none;
-        }
-      }
-      .tag-selector {
-        background-color: #000;
-        color: #fff;
-        padding: 4px 8px;
-        font-size: 12px;
-        border-radius: 5px;
-        margin: 0;
-      }
-    }
-    .adress-deteil-change-wrapper {
-      input {
-        border: none;
-        border-bottom: 0.5px solid #9f9f9f;
-        background-color: #f6f6f6;
-        font-size: 16px;
-        margin: 16px 0;
-        width: 40%;
 
-        &:focus {
-          outline: none;
-        }
-      }
-    }
-    input {
-      border: none;
-      border-bottom: 0.5px solid #9f9f9f;
-      background-color: #f6f6f6;
-      font-size: 16px;
-      &:focus {
-        outline: none;
-      }
-    }
-  }
-  .button-wrapper {
+  .add-adress-wrapper {
     display: flex;
     align-items: center;
-
+    gap: 15px;
+    margin-bottom: 20px;
+    
     button {
-      background-color: transparent;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #000;
       border: none;
-      margin: 0 12px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      @include mix.respond-to(var.$mobile) {
-        margin: 0;
+      
+      img { filter: invert(1); }
+    }
+
+    .dashed-line {
+      flex: 1;
+      height: 1px;
+      border-bottom: 1px dashed #ccc;
+    }
+  }
+
+  .adress-change-item {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+
+    .items-change {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      input, select {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        outline: none;
+        
+        &:focus {
+          border-color: #000;
+        }
       }
+
+      .adress-name-change-wrapper, .adress-deteil-change-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+    }
+
+    .button-wrapper {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      
+      button {
+        background: none; border: none; cursor: pointer;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .address-selector-wrapper .adress-change-item .items-change {
+    .adress-name-change-wrapper, .adress-deteil-change-wrapper {
+      grid-template-columns: 1fr;
     }
   }
 }

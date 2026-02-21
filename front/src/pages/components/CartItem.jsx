@@ -8,7 +8,7 @@ import PlusSvg from "../../assets/Plus.svg";
 
 import { addItem, minusItem, removeItem } from "../../redux/slices/cartSlice";
 
-const CartItem = ({ id, title, price, count, imageUrl, type, size }) => {
+const CartItem = ({ id, title, price, count, imageUrl, options }) => {
   const dispatch = useDispatch();
 
   const onClickPlus = () => {
@@ -18,8 +18,7 @@ const CartItem = ({ id, title, price, count, imageUrl, type, size }) => {
         title,
         price,
         imageUrl,
-        type,
-        size,
+        options,
       })
     );
   };
@@ -47,7 +46,10 @@ const CartItem = ({ id, title, price, count, imageUrl, type, size }) => {
       </div>
       <div className="cart-item__info">
         <h3>{title}</h3>
-        <p>{type} {size}</p> 
+        {/* Динамический вывод опций */}
+        <p style={{ fontSize: '13px', color: '#888' }}>
+          {options ? Object.values(options).join(' / ') : ''}
+        </p> 
       </div>
       <div className="cart-item__count">
         <button
