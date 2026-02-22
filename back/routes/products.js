@@ -6,7 +6,8 @@ import checkAdmin from '../utils/checkAdmin.js';
 import { 
   getFilters, 
   getAll, 
-  getOne, 
+  getOne,
+  create, 
   remove, 
   update, 
   createBulk 
@@ -20,6 +21,9 @@ router.get('/', getAll);
 router.get('/:id', getOne);
 
 // --- ДЕЙСТВИЯ АДМИНА ---
+
+// Создание одного товара
+router.post('/', checkAuth, checkAdmin, create);
 
 // Массовое добавление товаров через JSON
 router.post('/bulk', checkAuth, checkAdmin, createBulk);

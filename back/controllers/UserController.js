@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import UserModel from '../models/User.js'
+import User from '../models/User.js';
 
 export const updateMe = async (req, res) => {
   try {

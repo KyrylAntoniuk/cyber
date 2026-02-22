@@ -37,14 +37,17 @@ export default function WishlistPage() {
             // Бэкенд возвращает объект: { _id: "...", product: { ...товар... } }
             // Нам нужно достать именно поле product.
             // Если вдруг товар был удален из базы, product может быть null, поэтому ставим проверку.
-            if (!item.product) return console.log(item);
+            if (!item.product) return null;
 
             return (
-              <><ProductCard
+              <ProductCard
                 key={item.product._id}
                 {...item.product} // Передаем все свойства товара (img, productName, price)
+                title={item.product.title}
+                productName={item.product.title} // Совместимость с ProductCard
+                img={item.product.images?.[0]} 
                 isInWishlist={true} // Мы и так в вишлисте
-              /> </>
+              />
             );
           })}
         </div>

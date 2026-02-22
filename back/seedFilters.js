@@ -23,29 +23,36 @@ const createFilters = async () => {
         name: "Brand",
         queryKey: "brand",
         dbKey: "brand", 
-        options: ["Apple", "Samsung", "Xiaomi", "Google", "OnePlus"],
-        categories: ["phones", "laptops", "cameras"] // Показывать везде
+        options: ["Apple", "Samsung", "Xiaomi", "Google", "OnePlus", "Sony", "Canon", "GoPro", "Dell", "Asus"],
+        categories: ["smartphone", "laptop", "camera"] 
       },
       {
         name: "Screen Type",
         queryKey: "screenType",
-        dbKey: "screenType",
+        dbKey: "facets.screenType",
         options: ["AMOLED", "IPS", "OLED", "LCD"],
-        categories: ["phones", "laptops"] // Только телефоны и ноутбуки
+        categories: ["smartphone", "laptop"]
       },
       {
-        name: "Built-in Memory",
-        queryKey: "builtInMemory",
-        dbKey: "options.builtInMemory", // Путь к вложенному объекту options
-        options: ["64GB", "128GB", "256GB", "512GB", "1TB"],
-        categories: ["phones", "laptops"]
+        name: "Storage",
+        queryKey: "storage",
+        dbKey: "facets.storage", 
+        options: ["128", "256", "512", "1024"],
+        categories: ["smartphone", "laptop"]
       },
       {
-        name: "Battery Capacity",
-        queryKey: "batteryCapacity",
-        dbKey: "characteristics.Battery capacity", // Путь к характеристикам с пробелом
-        options: ["3000 mAh", "4000 mAh", "5000 mAh", "6000 mAh"],
-        categories: ["phones"] // Только телефоны
+        name: "RAM",
+        queryKey: "ram",
+        dbKey: "facets.ram",
+        options: ["8", "12", "16", "32"],
+        categories: ["smartphone", "laptop"]
+      },
+      {
+        name: "Resolution",
+        queryKey: "resolution",
+        dbKey: "facets.resolution",
+        options: ["4K", "Full HD", "33MP", "24MP", "27MP"],
+        categories: ["camera"]
       }
     ];
 

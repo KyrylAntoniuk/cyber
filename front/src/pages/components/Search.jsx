@@ -92,7 +92,7 @@ export default function Search() {
         }}
       />
       
-      {isOpen && fetchedProducts.length > 0 (  // add page locaction check
+      {isOpen && fetchedProducts.length > 0 && (
         <div className="preview-products">
           {fetchedProducts.map((item) => (
             <div
@@ -101,12 +101,12 @@ export default function Search() {
               onClick={() => handleItemClick(item._id)}
             >
               <img 
-                src={item.img} 
-                alt={item.productName} 
+                src={item.images?.[0]} 
+                alt={item.title} 
                 onError={(e) => { e.target.style.display = 'none'; }} 
               />
               <div className="preview-info">
-                <span>{item.productName}</span>
+                <span>{item.title}</span>
                 <b>{item.price} ₴</b>
               </div>
             </div>

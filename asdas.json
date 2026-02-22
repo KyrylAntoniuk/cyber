@@ -1,237 +1,91 @@
 [
   {
-    "productName": "Apple iPhone 14 Pro Max",
-    "price": 54999,
-    "category": "phones",
+    "title": "Apple iPhone 15 Pro 256GB Black Titanium",
+    "productName": "Apple iPhone 15 Pro 256GB Black Titanium",
+    "price": 1199,
+    "productType": "smartphone",
     "brand": "Apple",
-    "img": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&q=80&w=500",
-    "rating": 5,
-    "numReviews": 12,
-    "description": "iPhone 14 Pro Max. Capture incredible detail with a 48MP Main camera. Experience iPhone in a whole new way with Dynamic Island and Always-On display.",
-    "options": {
-      "color": ["#3e3e3e", "#e3e3e3", "#5c5b57", "#483248"],
-      "storage": ["128GB", "256GB", "512GB", "1TB"]
-    },
-    "characteristics": {
-      "Screen": "6.7 inch Super Retina XDR",
-      "Processor": "A16 Bionic",
-      "Camera": "48MP + 12MP + 12MP",
-      "Battery": "4323 mAh"
-    },
-    "details": [
-      {
-        "Display": [
-          { "Resolution": "2796 x 1290" },
-          { "Refresh Rate": "120Hz ProMotion" },
-          { "Type": "OLED" }
-        ]
-      },
-      {
-        "System": [
-          { "OS": "iOS 16" },
-          { "CPU": "6-core CPU" }
-        ]
-      }
-    ]
+    "images": [
+      "https://content2.rozetka.com.ua/goods/images/big/364623084.jpg"
+    ],
+    "description": "The first iPhone to feature an aerospace-grade titanium design.",
+    "specifications": [
+      { "key": "Экран", "value": "6.1\" Super Retina XDR" },
+      { "key": "Процессор", "value": "A17 Pro" },
+      { "key": "Память", "value": "256 ГБ" }
+    ],
+    "facets": {
+      "screen": "6.1",
+      "storage": "256GB",
+      "ram": "8GB",
+      "color": "Black",
+      "screenType": "OLED"
+    }
   },
   {
-    "productName": "Samsung Galaxy S23 Ultra",
-    "price": 49999,
-    "category": "phones",
+    "title": "Samsung Galaxy S24 Ultra 512GB Grey",
+    "productName": "Samsung Galaxy S24 Ultra 512GB Grey",
+    "price": 1299,
+    "productType": "smartphone",
     "brand": "Samsung",
-    "img": "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&q=80&w=500",
-    "rating": 4.8,
-    "numReviews": 8,
-    "description": "Galaxy S23 Ultra. More innovation, less footprint. Note's signature tool comes built in. The epic camera setup captures life in high definition.",
-    "options": {
-      "color": ["#1c1c1c", "#f5f5dc", "#3a5f0b"],
-      "storage": ["256GB", "512GB"]
-    },
-    "characteristics": {
-      "Screen": "6.8 inch Dynamic AMOLED 2X",
-      "Processor": "Snapdragon 8 Gen 2",
-      "Camera": "200MP + 10MP + 10MP + 12MP",
-      "S-Pen": "Included"
-    },
-    "details": [
-      {
-        "Display": [
-          { "Resolution": "3088 x 1440" },
-          { "Peak Brightness": "1750 nits" }
-        ]
-      }
-    ]
+    "images": [
+      "https://content.rozetka.com.ua/goods/images/big/403195936.jpg"
+    ],
+    "description": "Galaxy AI is here. Welcome to the era of mobile AI.",
+    "specifications": [
+      { "key": "Экран", "value": "6.8\" Dynamic AMOLED 2X" },
+      { "key": "Процессор", "value": "Snapdragon 8 Gen 3" },
+      { "key": "Камера", "value": "200 МП" }
+    ],
+    "facets": {
+      "screen": "6.8",
+      "storage": "512GB",
+      "ram": "12GB",
+      "color": "Grey",
+      "screenType": "AMOLED"
+    }
   },
   {
-    "productName": "Google Pixel 7 Pro",
-    "price": 32000,
-    "category": "phones",
-    "brand": "Google",
-    "img": "https://images.unsplash.com/photo-1598327770170-3a8661cd3a2b?auto=format&fit=crop&q=80&w=500",
-    "rating": 4.5,
-    "numReviews": 5,
-    "description": "Google's most powerful phone. Powered by Google Tensor G2, it's fast and secure, with an immersive display and amazing battery life.",
-    "options": {
-      "color": ["#363636", "#ffffff", "#8f9779"],
-      "storage": ["128GB", "256GB"]
-    },
-    "characteristics": {
-      "Screen": "6.7 inch LTPO OLED",
-      "Processor": "Google Tensor G2",
-      "RAM": "12GB"
-    },
-    "details": []
-  },
-  {
-    "productName": "MacBook Pro 14 M2",
-    "price": 89999,
-    "category": "laptops",
+    "title": "MacBook Pro 14 M3 Pro 18GB/512GB Space Black",
+    "productName": "MacBook Pro 14 M3 Pro",
+    "price": 1999,
+    "productType": "laptop",
     "brand": "Apple",
-    "img": "https://images.unsplash.com/photo-1517336714731-489689fd1ca4?auto=format&fit=crop&q=80&w=500",
-    "rating": 5,
-    "numReviews": 20,
-    "description": "M2 Pro or M2 Max chip. The most powerful MacBook Pro ever. Supercharged for pros.",
-    "options": {
-      "color": ["#7d7d7d", "#c7c7c7"],
-      "ram": ["16GB", "32GB"],
-      "ssd": ["512GB", "1TB"]
-    },
-    "characteristics": {
-      "Screen": "14.2 Liquid Retina XDR",
-      "Processor": "Apple M2 Pro",
-      "Battery": "Up to 18 hours"
-    },
-    "details": [
-      {
-        "Performance": [
-          { "Chip": "Apple M2 Pro" },
-          { "Cores": "10-core CPU" }
-        ]
-      },
-      {
-        "Connectivity": [
-          { "Ports": "3x Thunderbolt 4, HDMI, SDXC" },
-          { "Wifi": "Wi-Fi 6E" }
-        ]
-      }
-    ]
+    "images": [
+      "https://content1.rozetka.com.ua/goods/images/big/376776622.jpg"
+    ],
+    "description": "Mind-blowing. Head-turning. With M3 Pro chip.",
+    "specifications": [
+      { "key": "Экран", "value": "14.2\" Liquid Retina XDR" },
+      { "key": "Процессор", "value": "Apple M3 Pro" },
+      { "key": "ОЗУ", "value": "18 ГБ" }
+    ],
+    "facets": {
+      "screen": "14.2",
+      "storage": "512GB",
+      "ram": "18GB",
+      "processor": "M3 Pro",
+      "screenType": "XDR"
+    }
   },
   {
-    "productName": "Dell XPS 13 Plus",
-    "price": 65000,
-    "category": "laptops",
-    "brand": "Dell",
-    "img": "https://images.unsplash.com/photo-1593642632823-8f78536788c6?auto=format&fit=crop&q=80&w=500",
-    "rating": 4.2,
-    "numReviews": 3,
-    "description": "Twice as powerful as before. In the same size. It features 12th Gen Intel Core processors and the latest battery technology.",
-    "options": {
-      "color": ["#dcdcdc", "#2f2f2f"],
-      "ram": ["16GB", "32GB"]
-    },
-    "characteristics": {
-      "Screen": "13.4 OLED 3.5K",
-      "Processor": "Intel Core i7-1260P",
-      "OS": "Windows 11 Home"
-    },
-    "details": []
-  },
-  {
-    "productName": "ASUS ROG Zephyrus G14",
-    "price": 72000,
-    "category": "laptops",
-    "brand": "Asus",
-    "img": "https://images.unsplash.com/photo-1630794180018-433d915c34ac?auto=format&fit=crop&q=80&w=500",
-    "rating": 4.9,
-    "numReviews": 15,
-    "description": "Dynamic and ready to travel, the pioneering ROG Zephyrus G14 is the world's most powerful 14-inch Windows 10 Pro gaming laptop.",
-    "options": {
-      "color": ["#ffffff", "#333333"],
-      "gpu": ["RTX 4060", "RTX 4070"]
-    },
-    "characteristics": {
-      "Screen": "14 inch 165Hz",
-      "Processor": "AMD Ryzen 9",
-      "Graphics": "NVIDIA GeForce RTX 4060"
-    },
-    "details": [
-      {
-        "Gaming": [
-          { "Refresh Rate": "165Hz" },
-          { "Response Time": "3ms" }
-        ]
-      }
-    ]
-  },
-  {
+    "title": "Sony Alpha a7 IV Body",
     "productName": "Sony Alpha a7 IV",
-    "price": 95000,
-    "category": "cameras",
+    "price": 2498,
+    "productType": "camera",
     "brand": "Sony",
-    "img": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=500",
-    "rating": 5,
-    "numReviews": 7,
-    "description": "The basic is never basic. Prepare to be inspired. The true-to-life resolution and remarkable AI-powered autofocus of the a7 IV complement a range of world-class features.",
-    "options": {
-      "kit": ["Body Only", "With 28-70mm Lens"]
-    },
-    "characteristics": {
-      "Sensor": "33MP Full-Frame Exmor R CMOS",
-      "Video": "4K 60p",
-      "ISO": "100-51200"
-    },
-    "details": [
-      {
-        "Imaging": [
-          { "Pixels": "33 Megapixel" },
-          { "Mount": "Sony E" }
-        ]
-      }
-    ]
-  },
-  {
-    "productName": "Canon EOS R6 Mark II",
-    "price": 88000,
-    "category": "cameras",
-    "brand": "Canon",
-    "img": "https://images.unsplash.com/photo-1519183071298-a2962feb14f4?auto=format&fit=crop&q=80&w=500",
-    "rating": 4.7,
-    "numReviews": 4,
-    "description": "Master stills and motion. The EOS R6 Mark II sets a new standard for hybrid camera performance.",
-    "options": {
-      "kit": ["Body Only", "With 24-105mm Lens"]
-    },
-    "characteristics": {
-      "Sensor": "24.2MP Full-Frame CMOS",
-      "FPS": "Up to 40 fps",
-      "Stabilization": "In-Body 5-Axis"
-    },
-    "details": []
-  },
-  {
-    "productName": "GoPro HERO11 Black",
-    "price": 18000,
-    "category": "cameras",
-    "brand": "GoPro",
-    "img": "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&q=80&w=500",
-    "rating": 4.6,
-    "numReviews": 30,
-    "description": "Capture. Charge. Relax. That's all it takes to get incredible highlight videos sent to your phone automatically.",
-    "options": {
-      "bundle": ["Standard", "Creator Edition"]
-    },
-    "characteristics": {
-      "Video": "5.3K60 + 4K120",
-      "Photo": "27MP",
-      "Waterproof": "10m (33ft)"
-    },
-    "details": [
-      {
-        "Features": [
-          { "Stabilization": "HyperSmooth 5.0" },
-          { "Screens": "Front + Rear LCD" }
-        ]
-      }
-    ]
+    "images": [
+      "https://content2.rozetka.com.ua/goods/images/big/246009684.jpg"
+    ],
+    "description": "Basic has never been this good.",
+    "specifications": [
+      { "key": "Матрица", "value": "33 МП Full-Frame" },
+      { "key": "Видео", "value": "4K 60p" }
+    ],
+    "facets": {
+      "resolution": "33MP",
+      "sensorType": "Full-Frame",
+      "video": "4K"
+    }
   }
 ]

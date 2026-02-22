@@ -1,16 +1,11 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const FilterSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },      // Отображаемое имя (напр. "Built-in Memory")
-    queryKey: { type: String, required: true, unique: true }, // Ключ в URL (напр. "builtInMemory")
-    dbKey: { type: String, required: true },     // Путь в БД (напр. "options.builtInMemory")
-    type: { type: String, default: "checkbox" }, // Тип фильтра
-    options: [{ type: String }],                 // Список доступных значений
-    categories: [String]
-  },
-  { timestamps: true }
-);
+const FilterSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // Отображаемое имя (Screen Size)
+  queryKey: { type: String, required: true, unique: true }, // Ключ в URL (screen)
+  dbKey: { type: String, required: true }, // Путь в БД (specs.screen)
+  options: [{ type: String }], // Доступные опции ["6.1", "6.7"]
+  categories: [{ type: String }], // Категории, к которым относится фильтр
+});
 
-// ВАЖНО: Вот эта строка экспортирует модель по умолчанию
-export default mongoose.model("Filter", FilterSchema);
+export default mongoose.model('Filter', FilterSchema);
